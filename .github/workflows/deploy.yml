@@ -1,8 +1,8 @@
 name: Deploy to GitHub Pages
 
+# Manual only until launch (phase 3 in the backlog). To publish on every push,
+# restore:  push: { branches: [main] }  and set Settings → Pages → Source: GitHub Actions.
 on:
-  push:
-    branches: [main]
   workflow_dispatch:
 
 permissions:
