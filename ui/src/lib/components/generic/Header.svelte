@@ -14,9 +14,14 @@
 	<div
 		class="container mx-auto flex max-w-screen-2xl items-center justify-between gap-4 px-4 xl:px-10"
 	>
-		<a href={resolve('/')} class="flex items-center gap-2" title="draftle">
+		<a href={resolve('/')} class="flex items-center gap-2" title="draftle" aria-label="draftle">
 			<Logo width="32" height="32" />
-			<span class="text-xl font-bold tracking-tight">draftle</span>
+			<!-- Wordmark: the last letter is the missing pick. -->
+			<span class="flex items-center text-xl font-bold tracking-tight" aria-hidden="true">
+				draftl<span
+					class="ml-0.5 inline-block h-[0.9em] w-[0.62em] rounded border-2 border-dashed border-(--side-red)"
+				></span>
+			</span>
 		</a>
 		<div class="flex items-stretch justify-end gap-2">
 			<Lightswitch />

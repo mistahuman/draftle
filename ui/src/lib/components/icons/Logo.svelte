@@ -1,19 +1,26 @@
 <script lang="ts">
-	let { width = '30', height = '30' }: { width?: string; height?: string } = $props();
+	let { width = '32', height = '32' }: { width?: string; height?: string } = $props();
+
+	const rows = [0, 1, 2, 3, 4];
 </script>
 
-<svg
-	{width}
-	{height}
-	viewBox="0 0 26.458333 26.458333"
-	fill="currentColor"
-	class="text-primary"
-	xmlns="http://www.w3.org/2000/svg"
->
-	<g id="layer1" transform="translate(-26.458332,-52.842582)">
-		<path
-			d="m 31.734931,74.024323 v -5.276591 h -2.638307 -2.638291 v -7.952569 -7.95258 h 2.675988 2.675976 v 2.638296 2.638296 h 7.877195 7.877201 v -2.638296 -2.638296 h 2.675988 2.675985 v 7.95258 7.952569 H 50.27837 47.640073 v 5.276591 5.276593 h -2.675988 -2.675987 v -5.276593 -5.276591 h -2.600606 -2.600601 v 5.276591 5.276593 h -2.675977 -2.675983 z m 5.276582,-7.952577 V 63.47114 h -2.600599 -2.600617 v 2.600606 2.600605 h 2.600617 2.600599 z m 10.55318,0 V 63.47114 H 44.964085 42.36348 v 2.600606 2.600605 h 2.600605 2.600608 z"
-			id="path176402"
-		></path>
-	</g>
+<!-- The whole draft: five blue picks, four red, and the last red slot empty.
+     Same mark as static/favicon.svg, which hard-codes the colours. -->
+<svg {width} {height} viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+	{#each rows as i (i)}
+		<rect x="4" y={2 + i * 6} width="10" height="4.5" rx="1.5" fill="var(--side-blue)" />
+	{/each}
+	{#each rows.slice(0, 4) as i (i)}
+		<rect x="18" y={2 + i * 6} width="10" height="4.5" rx="1.5" fill="var(--side-red)" />
+	{/each}
+	<rect
+		x="18.75"
+		y="26.75"
+		width="8.5"
+		height="3"
+		rx="1"
+		fill="none"
+		stroke="var(--side-red)"
+		stroke-width="1.5"
+	/>
 </svg>

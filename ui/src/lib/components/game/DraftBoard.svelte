@@ -82,13 +82,13 @@
 					<div class="flex items-center justify-end gap-2">
 						<span class="text-xs opacity-70">your pick</span>
 						<div
-							class="flex h-10 w-10 items-center justify-center rounded-md preset-filled-primary-500 text-lg font-bold"
+							class="flex h-10 w-10 items-center justify-center rounded-md bg-(--side-red) text-lg font-bold text-white"
 						>
 							?
 						</div>
 					</div>
 				{:else}
-					<div class={target ? 'rounded-md ring-2 ring-primary-500' : ''}>
+					<div class={target ? 'rounded-md ring-2 ring-(--side-red)' : ''}>
 						{@render pick(slot('red', role), true)}
 					</div>
 				{/if}
