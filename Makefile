@@ -1,4 +1,4 @@
-.PHONY: help install dev build test lint clean data spike
+.PHONY: help install dev build test lint clean data spike export
 
 help: ## Show this help
 	@grep -E '^[a-z]+:.*##' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  %-10s %s\n", $$1, $$2}'
@@ -23,6 +23,9 @@ lint: ## go vet + gofmt check + prettier check
 
 data: ## Download pro drafts (cached) into pipeline/data/drafts.json
 	cd pipeline && go run ./cmd/fetch
+
+export: ## Write the puzzle set to web/static/data/puzzles.json
+	cd pipeline && go run ./cmd/export
 
 spike: ## Measure how predictable R5 is from baseline signals
 	cd pipeline && go run ./cmd/spike
