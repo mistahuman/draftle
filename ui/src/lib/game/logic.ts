@@ -35,26 +35,46 @@ export function takenInDraft(p: Puzzle): Set<string> {
 	]);
 }
 
-// Hints unlock one per miss, weakest first.
-export function hints(p: Puzzle, answer: Champion): string[] {
-	const rank =
-		p.metaRank > 0
-			? `It is the #${p.metaRank} most picked ${p.role} of patch ${p.patch} (out of ${p.poolSize}).`
-			: `Nobody else picked it as ${p.role} in patch ${p.patch}: a pocket pick.`;
+// One hint unlocks per miss, weakest first. Every number is scoped to the puzzle's patch,
+// the same scope as the per-guess popularity. The class hint is skipped when a guess has
+// already matched the answer's class exactly. The check runs miss by miss, so a hint
+// already shown never disappears.
+export function unlockedHints(p: Puzzle, answer: Champion, guesses: Champion[]): string[] {
 	const vs = p.stats[p.answer]?.[1] ?? 0;
 	const decoys = Object.entries(p.stats)
 		.filter(([c]) => c !== p.answer)
 		.sort((a, b) => b[1][0] - a[1][0])
 		.slice(0, 2)
 		.map(([c]) => c);
-	const three = [...decoys, p.answer].sort();
-	return [
-		`Class: ${answer.tags.join(' / ')}.`,
-		`Picked as ${p.role} against ${p.opponent} ${vs} other time${vs === 1 ? '' : 's'} in pro play this season.`,
-		rank,
-		`It starts with "${p.answer[0]}".`,
-		`It is one of: ${three.join(', ')}.`
+	const queue: { kind: 'class' | 'other'; text: string }[] = [
+		{ kind: 'class', text: `Class: ${answer.tags.join(' / ')}.` },
+		{
+			kind: 'other',
+			text:
+				vs > 0
+					? `In patch ${p.patch} it was picked as ${p.role} against ${p.opponent} ${vs} other time${vs === 1 ? '' : 's'}.`
+					: `In patch ${p.patch} nobody else picked it as ${p.role} against ${p.opponent}.`
+		},
+		{
+			kind: 'other',
+			text:
+				p.metaRank > 0
+					? `It is the #${p.metaRank} most picked ${p.role} of patch ${p.patch} (out of ${p.poolSize}).`
+					: `Nobody else picked it as ${p.role} in patch ${p.patch}: a pocket pick.`
+		},
+		{ kind: 'other', text: `It starts with "${p.answer[0]}".` },
+		{ kind: 'other', text: `It is one of: ${[...decoys, p.answer].sort().join(', ')}.` }
 	];
+
+	const wrong = guesses.filter((g) => g.name !== answer.name);
+	const shown: string[] = [];
+	let next = 0;
+	wrong.forEach((_, k) => {
+		const classKnown = wrong.slice(0, k + 1).some((g) => classMatch(g, answer) === 'same');
+		while (next < queue.length && queue[next].kind === 'class' && classKnown) next++;
+		if (next < queue.length) shown.push(queue[next++].text);
+	});
+	return shown;
 }
 
 export function shareText(

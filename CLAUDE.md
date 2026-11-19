@@ -41,44 +41,15 @@ does not run Go. Rerun `make export` and commit after `make data`.
   `draftle:day:<n>`. "Practice puzzle" (shown after the end) picks a random puzzle that is not saved.
 - `src/lib/game/logic.ts`: rules. 6 tries. Each guess shows class match (Data Dragon
   tags) and whether the answer is more or less picked in that role and patch. One hint
-  unlocks per miss: class → picks against the lane opponent → meta rank → first letter →
-  one of three.
+  unlocks per miss (`unlockedHints`): class → picks against the lane opponent → meta rank →
+  first letter → one of three. The class hint is skipped once a guess matched the class
+  exactly. That is checked miss by miss, so a hint already shown never disappears.
+- **Every number the player sees is per patch** (popularity, picks vs lane opponent, meta
+  rank). `stats.Counts` counts per patch for that reason. Per patch, the vs-opponent count
+  for an answer has a median of 4 and is 0 in about 20% of puzzles, and a 0 is a hint too.
 - Champion names from Leaguepedia match Data Dragon `name` exactly (checked on
   2026-11-19, 173 champions). Only `None` / `Missing Data` placeholders differ. Icons load
   from the Data Dragon CDN at the version in the JSON.
-- Known wrinkle: the per-guess popularity counts are per patch, while the
-  lane-opponent hint counts the whole season. So the hint number can be larger than the
-  popularity numbers.
-
-## Data
-
-- **Source: Leaguepedia Cargo API** (`lol.fandom.com/api.php`), tables `PicksAndBansS7`
-  joined to `ScoreboardGames` on `GameId` for `Patch`. Licence CC BY-SA: attribution is
-  in the footer. Oracle's Elixir was dropped because its old S3 URLs return 404.
-- **Rate limiting is aggressive.** It cut in after about four quick queries. The client
-  waits 10 s between pages and backs off on errors, and every page is cached under
-  `pipeline/data/raw/<year>/`. Never delete the cache casually: a full 2026 fetch is
-  23 pages.
-- `pipeline/data/` is gitignored.
-- Riot API (soloq matchups) is **not used**. A production key would be needed for a
-  public app.
-
-## Baseline (2026-11-19, 11,072 drafts, 30 patches)
-
-How often the real R5 is in the top-k of a ranking. Candidates = champions picked in
-that role and patch, minus anything already picked or banned (≈44 on average).
-Counts are leave-one-out.
-
-| ranking | top1 | top3 | top5 | top10 |
-|---|---|---|---|---|
-| meta (patch frequency) | 9.5% | 26.7% | 41.3% | 68.5% |
-| lane opponent (year) | 11.9% | 31.2% | 46.9% | 72.2% |
-| lane opponent + meta | 11.9% | 31.3% | 47.0% | 72.3% |
-
-Reading: knowing the meta alone does not solve the puzzle, so there is a real game.
-Lane opponent adds a little. Only 2.5% of R5s were never picked elsewhere in that
-role and patch. A first-try guess will rarely be right, so the daily needs multiple
-guesses with hints, not a single shot.
 
 ## Legal
 

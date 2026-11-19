@@ -45,3 +45,14 @@ func TestR5PoolDropsUnseenAnswer(t *testing.T) {
 		}
 	}
 }
+
+func TestR5PoolIsPerPatch(t *testing.T) {
+	other := game("Poppy", "Vi")
+	other.Patch = "26.04"
+	games := []draft.Game{game("Sejuani", "Vi"), game("Poppy", "Vi"), other}
+	for _, c := range Build(games).R5Pool(games[0]) {
+		if c.Champ == "Poppy" && (c.Freq != 1 || c.VsOpp != 1) {
+			t.Errorf("Poppy = %+v: the 26.04 game must not count in 26.05", c)
+		}
+	}
+}

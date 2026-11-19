@@ -24,10 +24,13 @@ func (n nested) add(a, b, champ string) {
 // Counts holds pick frequencies across a set of games.
 type Counts struct {
 	freq    nested // [patch][role][champ]
-	matchup nested // [role][lane opponent][champ]
+	matchup nested // [patch][role + "/" + lane opponent][champ]
 }
 
-// Build counts every pick in games, by role and patch and by lane opponent.
+func laneKey(role, opp string) string { return role + "/" + opp }
+
+// Build counts every pick in games by patch and role, and by patch, role and lane
+// opponent. Everything is per patch so every number shown to a player has one scope.
 func Build(games []draft.Game) *Counts {
 	c := &Counts{freq: nested{}, matchup: nested{}}
 	for _, g := range games {
@@ -35,10 +38,10 @@ func Build(games []draft.Game) *Counts {
 			c.freq.add(g.Patch, g.Roles1[i], g.Picks1[i])
 			c.freq.add(g.Patch, g.Roles2[i], g.Picks2[i])
 			if o := g.LaneOpponent(1, i); o != "" {
-				c.matchup.add(g.Roles1[i], o, g.Picks1[i])
+				c.matchup.add(g.Patch, laneKey(g.Roles1[i], o), g.Picks1[i])
 			}
 			if o := g.LaneOpponent(2, i); o != "" {
-				c.matchup.add(g.Roles2[i], o, g.Picks2[i])
+				c.matchup.add(g.Patch, laneKey(g.Roles2[i], o), g.Picks2[i])
 			}
 		}
 	}
@@ -49,7 +52,7 @@ func Build(games []draft.Game) *Counts {
 type Candidate struct {
 	Champ string
 	Freq  int // picks in R5's role and patch, excluding this game
-	VsOpp int // picks in R5's role against R5's lane opponent, excluding this game
+	VsOpp int // picks in R5's role and patch against R5's lane opponent, excluding this game
 }
 
 // R5Pool returns every champion picked in R5's role and patch elsewhere, minus
@@ -59,7 +62,7 @@ func (c *Counts) R5Pool(g draft.Game) []Candidate {
 	taken := g.TakenBeforeR5()
 	var pool []Candidate
 	for champ, n := range c.freq[g.Patch][role] {
-		cand := Candidate{Champ: champ, Freq: n, VsOpp: c.matchup[role][opp][champ]}
+		cand := Candidate{Champ: champ, Freq: n, VsOpp: c.matchup[g.Patch][laneKey(role, opp)][champ]}
 		if champ == actual {
 			cand.Freq--
 			cand.VsOpp--

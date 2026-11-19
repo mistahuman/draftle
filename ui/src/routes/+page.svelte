@@ -9,10 +9,10 @@
 		classMatch,
 		dailyIndex,
 		dayNumber,
-		hints,
 		picksInRole,
 		shareText,
-		takenInDraft
+		takenInDraft,
+		unlockedHints
 	} from '$lib/game/logic';
 	import type { Champion, PuzzleData } from '$lib/game/types';
 
@@ -50,8 +50,7 @@
 	let guessed = $derived(guesses.map((g) => byName.get(g)).filter((c): c is Champion => !!c));
 	let won = $derived(!!puzzle && guesses.includes(puzzle.answer));
 	let over = $derived(won || guesses.length >= MAX_GUESSES);
-	let misses = $derived(guesses.filter((g) => g !== puzzle?.answer).length);
-	let hintList = $derived(puzzle && answer ? hints(puzzle, answer) : []);
+	let hintList = $derived(puzzle && answer ? unlockedHints(puzzle, answer, guessed) : []);
 	let blocked = $derived(new Set([...(puzzle ? takenInDraft(puzzle) : []), ...guesses]));
 
 	function guess(c: Champion) {
@@ -130,12 +129,12 @@
 							<span class="ml-auto badge preset-filled-success-500">correct</span>
 						{:else}
 							<span class="ml-auto badge {matchClass[m]}">{matchLabel[m]}</span>
-							<span class="badge preset-tonal-surface" title="picks as {puzzle.role} this patch">
-								{mine}× {mine === target
-									? '='
-									: target > mine
-										? '↑ more popular'
-										: '↓ less popular'}
+							<span
+								class="badge preset-tonal-surface"
+								title="picks as {puzzle.role} in patch {puzzle.patch}"
+							>
+								{mine}× in {puzzle.patch}
+								{mine === target ? '=' : target > mine ? '↑ more popular' : '↓ less popular'}
 							</span>
 						{/if}
 					</li>
@@ -143,11 +142,11 @@
 			</ol>
 		{/if}
 
-		{#if misses > 0 && !over}
+		{#if hintList.length > 0 && !over}
 			<div class="space-y-1 card preset-tonal-primary p-4">
 				<h3 class="text-sm font-bold">Hints</h3>
 				<ul class="list-inside list-disc text-sm">
-					{#each hintList.slice(0, misses) as h (h)}
+					{#each hintList as h (h)}
 						<li>{h}</li>
 					{/each}
 				</ul>
