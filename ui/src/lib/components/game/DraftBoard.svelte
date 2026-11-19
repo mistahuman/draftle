@@ -35,6 +35,20 @@
 			return { champ: puzzle.answer, order: 'R5' };
 		return undefined;
 	}
+
+	// Pro draft pick order. The second ban phase sits between R3 and R4.
+	const sequence: { side: 'blue' | 'red'; i: number }[] = [
+		{ side: 'blue', i: 0 },
+		{ side: 'red', i: 0 },
+		{ side: 'red', i: 1 },
+		{ side: 'blue', i: 1 },
+		{ side: 'blue', i: 2 },
+		{ side: 'red', i: 2 },
+		{ side: 'red', i: 3 },
+		{ side: 'blue', i: 3 },
+		{ side: 'blue', i: 4 },
+		{ side: 'red', i: 4 }
+	];
 </script>
 
 {#snippet bans(list: string[], end = false)}
@@ -62,7 +76,44 @@
 	{/if}
 {/snippet}
 
-<div class="space-y-3">
+<div class="space-y-4">
+	<div class="space-y-1.5">
+		<div class="font-mono text-[10px] tracking-widest uppercase opacity-50">Pick order</div>
+		<ol class="flex items-start gap-1">
+			{#each sequence as step, k (k)}
+				{@const blue = step.side === 'blue'}
+				{@const champ = blue
+					? puzzle.blue.picks[step.i]?.champ
+					: step.i < 4
+						? puzzle.red.picks[step.i]?.champ
+						: reveal
+							? puzzle.answer
+							: undefined}
+				{#if k === 6}
+					<li class="mx-0.5 self-stretch border-l border-dotted border-surface-400-600"></li>
+				{/if}
+				<li class="flex max-w-9 min-w-0 flex-1 flex-col items-center gap-1">
+					<div
+						class="w-full border-b-2 pb-0.5 {blue
+							? 'border-(--side-blue)'
+							: 'border-(--side-red)'} [&_img]:h-auto [&_img]:w-full"
+					>
+						{#if champ}
+							<ChampIcon {version} id={byName.get(champ)?.id} name={champ} size={36} />
+						{:else}
+							<div
+								class="flex aspect-square w-full items-center justify-center rounded-base border-2 border-dashed border-(--side-red) text-sm font-semibold text-(--side-red)"
+							>
+								?
+							</div>
+						{/if}
+					</div>
+					<span class="font-mono text-[10px] opacity-50">{blue ? 'B' : 'R'}{step.i + 1}</span>
+				</li>
+			{/each}
+		</ol>
+	</div>
+
 	<div class="grid grid-cols-2 gap-4">
 		<div class="space-y-1.5">
 			<div class="text-sm font-semibold text-(--side-blue)">Blue side</div>
