@@ -59,6 +59,11 @@ does not run Go. Rerun `make export` and commit after `make data`.
   2026-11-19: R5 is Top in 158/365 puzzles, Support in 71, and only 24 red drafts happen
   to be in role order (Daily #1 is one of them). Tried and dropped: lane rows (blue | role
   | red) and a pick-order strip above them.
+- After the puzzle, a "who won?" bonus: two buttons with the team names, answer stored under
+  `draftle:day:<n>:winner`, one extra line in the share text. Separate from the score on
+  purpose: blue wins 185 of the 365 puzzles, so it is close to a coin flip. Team names
+  (`blueTeam`, `redTeam`, from `ScoreboardGames.Team1/Team2`, Team1 = blue) and the game
+  `date` stay hidden on the board until the puzzle ends.
 - Bans are always five positions in the JSON, `""` for a skipped ban, so the phases line up.
 - `src/lib/game/logic.ts`: rules. 6 tries. Each guess shows class match (Data Dragon
   tags) and whether the answer is more or less picked in that role and patch. One hint

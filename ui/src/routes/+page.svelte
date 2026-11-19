@@ -24,8 +24,11 @@
 	let index = $state(0);
 	let guesses = $state<string[]>([]);
 	let copied = $state(false);
+	// The "who won?" bonus after the puzzle: 1 blue, 2 red, null not answered yet.
+	let winnerCall = $state<1 | 2 | null>(null);
 
 	const storageKey = (d: number) => `draftle:day:${d}`;
+	const winnerKey = (d: number) => `draftle:day:${d}:winner`;
 
 	onMount(async () => {
 		try {
@@ -36,6 +39,8 @@
 			try {
 				const saved = localStorage.getItem(storageKey(day));
 				if (saved) guesses = JSON.parse(saved);
+				const call = localStorage.getItem(winnerKey(day));
+				if (call === '1' || call === '2') winnerCall = Number(call) as 1 | 2;
 			} catch {
 				// storage unavailable: play without saving
 			}
@@ -51,6 +56,8 @@
 	let won = $derived(!!puzzle && guesses.includes(puzzle.answer));
 	let over = $derived(won || guesses.length >= MAX_GUESSES);
 	let hintList = $derived(puzzle && answer ? unlockedHints(puzzle, answer, guessed) : []);
+	let blueName = $derived(puzzle?.blueTeam || 'Blue side');
+	let redName = $derived(puzzle?.redTeam || 'Red side');
 	let blocked = $derived(new Set([...(puzzle ? takenInDraft(puzzle) : []), ...guesses]));
 
 	function guess(c: Champion) {
@@ -65,23 +72,53 @@
 		}
 	}
 
+	function callWinner(side: 1 | 2) {
+		if (winnerCall !== null) return;
+		winnerCall = side;
+		copied = false;
+		if (mode === 'daily') {
+			try {
+				localStorage.setItem(winnerKey(day), String(side));
+			} catch {
+				// storage unavailable
+			}
+		}
+	}
+
 	function practice() {
 		if (!data) return;
 		mode = 'practice';
 		index = Math.floor(Math.random() * data.puzzles.length);
 		guesses = [];
+		winnerCall = null;
 		copied = false;
 	}
 
 	async function share() {
 		if (!answer) return;
 		try {
-			await navigator.clipboard.writeText(shareText(day, guessed, answer, won));
+			await navigator.clipboard.writeText(
+				shareText(
+					day,
+					guessed,
+					answer,
+					won,
+					winnerCall === null ? undefined : winnerCall === puzzle?.winner
+				)
+			);
 			copied = true;
 		} catch {
 			copied = false;
 		}
 	}
+
+	const fmtDate = (d: string) =>
+		new Date(d + 'T00:00:00Z').toLocaleDateString('en-GB', {
+			day: 'numeric',
+			month: 'short',
+			year: 'numeric',
+			timeZone: 'UTC'
+		});
 
 	const matchLabel = { same: 'same', partial: 'partial', none: 'different' };
 	// Stamped labels: outline only, like a rubber stamp on the scorecard.
@@ -159,17 +196,50 @@
 				<p class="font-display text-2xl font-semibold tracking-tight">
 					{won ? `Got it in ${guesses.length}.` : `The pro picked ${puzzle.answer}.`}
 				</p>
-				<p class="font-mono text-xs tracking-wide uppercase opacity-60">
-					{puzzle.event.replaceAll('/', ' · ')}
-				</p>
 				<p class="text-sm opacity-80">
-					{puzzle.winner === 2 ? 'Red' : 'Blue'} side won.
 					{#if puzzle.metaRank > 0}
 						{puzzle.answer} was the #{puzzle.metaRank} most picked {puzzle.role} of the patch.
 					{:else}
 						Nobody else picked {puzzle.answer} as {puzzle.role} that patch.
 					{/if}
 				</p>
+
+				<div class="space-y-2 border-t border-dotted border-surface-400-600 pt-3">
+					{#if winnerCall === null}
+						<p class="font-mono text-[11px] tracking-[0.2em] uppercase opacity-60">
+							Bonus · who won the game?
+						</p>
+						<div class="flex items-center justify-center gap-2">
+							<button
+								class="btn border border-(--side-blue) text-(--side-blue) hover:bg-(--side-blue)/10"
+								onclick={() => callWinner(1)}>{blueName}</button
+							>
+							<span class="font-mono text-xs opacity-50">vs</span>
+							<button
+								class="btn border border-(--side-red) text-(--side-red) hover:bg-(--side-red)/10"
+								onclick={() => callWinner(2)}>{redName}</button
+							>
+						</div>
+					{:else}
+						<p>
+							<span
+								class="font-semibold {puzzle.winner === 2
+									? 'text-(--side-red)'
+									: 'text-(--side-blue)'}">{puzzle.winner === 2 ? redName : blueName}</span
+							>
+							won.
+							<span
+								class="badge font-mono text-[11px] uppercase {winnerCall === puzzle.winner
+									? 'preset-outlined-success-500'
+									: 'preset-outlined-surface-500 opacity-60'}"
+								>{winnerCall === puzzle.winner ? 'called it' : 'missed'}</span
+							>
+						</p>
+					{/if}
+					<p class="font-mono text-xs tracking-wide uppercase opacity-60">
+						{puzzle.event.replaceAll('/', ' · ')}{puzzle.date ? ` · ${fmtDate(puzzle.date)}` : ''}
+					</p>
+				</div>
 				<div class="flex justify-center gap-2 pt-1">
 					{#if mode === 'daily'}
 						<button class="btn preset-filled-primary-500" onclick={share}>

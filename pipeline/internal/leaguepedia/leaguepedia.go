@@ -26,7 +26,8 @@ const (
 )
 
 func fields() string {
-	f := []string{"PB.GameId=gid", "PB.OverviewPage=ov", "PB.Winner=win", "SG.Patch=patch"}
+	f := []string{"PB.GameId=gid", "PB.OverviewPage=ov", "PB.Winner=win", "SG.Patch=patch",
+		"SG.Team1=t1", "SG.Team2=t2", "SG.DateTime_UTC=date"}
 	for t := 1; t <= 2; t++ {
 		for i := 1; i <= 5; i++ {
 			f = append(f,
@@ -124,7 +125,8 @@ func Parse(body []byte) ([]draft.Game, error) {
 	for _, row := range r.Cargoquery {
 		m := row.Title
 		win, _ := strconv.Atoi(m["win"])
-		g := draft.Game{GameID: m["gid"], Patch: m["patch"], Overview: m["ov"], Winner: win}
+		g := draft.Game{GameID: m["gid"], Patch: m["patch"], Overview: m["ov"], Winner: win,
+			Team1: m["t1"], Team2: m["t2"], Date: m["date"]}
 		for i := 0; i < 5; i++ {
 			n := i + 1
 			g.Picks1[i], g.Picks2[i] = m[fmt.Sprintf("p1%d", n)], m[fmt.Sprintf("p2%d", n)]

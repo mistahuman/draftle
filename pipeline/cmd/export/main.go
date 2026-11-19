@@ -33,6 +33,9 @@ type puzzle struct {
 	Patch    string            `json:"patch"`
 	Event    string            `json:"event"`
 	Winner   int               `json:"winner"`
+	BlueTeam string            `json:"blueTeam"`
+	RedTeam  string            `json:"redTeam"`
+	Date     string            `json:"date"` // YYYY-MM-DD, UTC; "" if unknown
 	Blue     side              `json:"blue"`
 	Red      side              `json:"red"` // first four picks only
 	Role     string            `json:"role"`
@@ -148,6 +151,7 @@ func main() {
 		pool := counts.R5Pool(g)
 		p := puzzle{
 			ID: g.GameID, Patch: g.Patch, Event: g.Overview, Winner: g.Winner,
+			BlueTeam: g.Team1, RedTeam: g.Team2, Date: dateOnly(g.Date),
 			Blue:     side{Bans: cleanBans(g.Bans1)},
 			Red:      side{Bans: cleanBans(g.Bans2)},
 			Role:     g.Roles2[4],
@@ -180,4 +184,12 @@ func main() {
 	}
 	fmt.Printf("%d puzzles from patches %v, %d champions (Data Dragon %s) → %s (%d KB)\n",
 		len(o.Puzzles), ordered, len(champs), version, *out, len(body)/1024)
+}
+
+// dateOnly keeps the day of a Leaguepedia "2026-08-14 09:00:00" timestamp.
+func dateOnly(ts string) string {
+	if len(ts) < 10 {
+		return ""
+	}
+	return ts[:10]
 }

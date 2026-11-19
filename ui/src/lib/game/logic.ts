@@ -81,7 +81,8 @@ export function shareText(
 	day: number,
 	guesses: Champion[],
 	answer: Champion,
-	won: boolean
+	won: boolean,
+	calledWinner?: boolean // the "who won?" bonus; undefined if not answered
 ): string {
 	const squares = guesses
 		.map((g) => {
@@ -89,5 +90,6 @@ export function shareText(
 			return { same: '🟨', partial: '🟧', none: '⬛' }[classMatch(g, answer)];
 		})
 		.join('');
-	return `draftle #${day} ${won ? guesses.length : 'X'}/${MAX_GUESSES}\n${squares}`;
+	const bonus = calledWinner === undefined ? '' : `\nwinner ${calledWinner ? '✅' : '❌'}`;
+	return `draftle #${day} ${won ? guesses.length : 'X'}/${MAX_GUESSES}\n${squares}${bonus}`;
 }

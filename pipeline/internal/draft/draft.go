@@ -8,6 +8,9 @@ type Game struct {
 	Patch    string    `json:"patch"`
 	Overview string    `json:"overview"`
 	Winner   int       `json:"winner"` // 1 or 2, 0 if unknown
+	Team1    string    `json:"team1"`  // blue side team name
+	Team2    string    `json:"team2"`  // red side team name
+	Date     string    `json:"date"`   // "2026-08-14 09:00:00", UTC
 	Picks1   [5]string `json:"picks1"`
 	Picks2   [5]string `json:"picks2"`
 	Roles1   [5]string `json:"roles1"`

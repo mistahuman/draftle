@@ -21,6 +21,9 @@ export interface Puzzle {
 	patch: string;
 	event: string;
 	winner: number; // 1 blue, 2 red
+	blueTeam: string;
+	redTeam: string;
+	date: string; // YYYY-MM-DD, "" if unknown
 	blue: Side;
 	red: Side; // first four picks
 	role: string;

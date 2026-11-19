@@ -91,11 +91,15 @@
 <div class="space-y-4">
 	<div class="grid grid-cols-2 gap-4">
 		<div class="space-y-2">
-			<div class="text-sm font-semibold text-(--side-blue)">Blue side</div>
+			<div class="text-sm font-semibold text-(--side-blue)">
+				{reveal && puzzle.blueTeam ? puzzle.blueTeam : 'Blue side'}
+			</div>
 			{@render bans(puzzle.blue.bans, false)}
 		</div>
 		<div class="space-y-2 text-right">
-			<div class="text-sm font-semibold text-(--side-red)">Red side</div>
+			<div class="text-sm font-semibold text-(--side-red)">
+				{reveal && puzzle.redTeam ? puzzle.redTeam : 'Red side'}
+			</div>
 			{@render bans(puzzle.red.bans, true)}
 		</div>
 	</div>
