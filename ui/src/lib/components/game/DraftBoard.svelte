@@ -14,6 +14,9 @@
 		reveal: boolean;
 	} = $props();
 
+	// Rows are lanes, so each pick faces its lane opponent. The B1…R5 label keeps the
+	// draft order visible.
+	const roles = ['Top', 'Jungle', 'Mid', 'Bot', 'Support'];
 	const roleShort: Record<string, string> = {
 		Top: 'TOP',
 		Jungle: 'JGL',
@@ -21,62 +24,75 @@
 		Bot: 'BOT',
 		Support: 'SUP'
 	};
+
+	type Slot = { champ: string; order: string } | undefined;
+
+	function slot(side: 'blue' | 'red', role: string): Slot {
+		const picks = puzzle[side].picks;
+		const i = picks.findIndex((p) => p.role === role);
+		if (i >= 0) return { champ: picks[i].champ, order: `${side === 'blue' ? 'B' : 'R'}${i + 1}` };
+		if (side === 'red' && role === puzzle.role && reveal)
+			return { champ: puzzle.answer, order: 'R5' };
+		return undefined;
+	}
 </script>
 
-{#snippet bans(list: string[])}
-	<div class="flex flex-wrap gap-1">
+{#snippet bans(list: string[], end = false)}
+	<div class="flex gap-1 {end ? 'justify-end' : ''}">
 		{#each list as b (b)}
-			<ChampIcon {version} id={byName.get(b)?.id} name={b} size={28} dim />
+			<ChampIcon {version} id={byName.get(b)?.id} name={b} size={24} dim />
 		{/each}
 	</div>
 {/snippet}
 
-{#snippet pickRow(champ: string, role: string, label: string, highlight = false)}
-	<div
-		class="flex items-center gap-3 rounded-lg p-1.5 {highlight
-			? 'preset-tonal-primary ring-2 ring-primary-500'
-			: ''}"
-	>
-		<span class="w-6 text-[10px] opacity-50">{label}</span>
-		<ChampIcon {version} id={byName.get(champ)?.id} name={champ} size={40} />
-		<div class="min-w-0">
-			<div class="truncate text-sm font-semibold">{champ}</div>
-			<div class="text-[10px] tracking-wider opacity-60">{roleShort[role] ?? role}</div>
+{#snippet pick(s: Slot, end: boolean)}
+	{#if s}
+		<div class="flex min-w-0 items-center gap-2 {end ? 'flex-row-reverse text-right' : ''}">
+			<ChampIcon {version} id={byName.get(s.champ)?.id} name={s.champ} size={40} />
+			<div class="min-w-0">
+				<div class="truncate text-sm font-semibold">{s.champ}</div>
+				<div class="text-[10px] opacity-50">{s.order}</div>
+			</div>
+		</div>
+	{/if}
+{/snippet}
+
+<div class="space-y-3">
+	<div class="grid grid-cols-2 items-end gap-4 text-xs font-bold tracking-wider uppercase">
+		<div class="space-y-2">
+			<div class="text-(--side-blue)">Blue</div>
+			{@render bans(puzzle.blue.bans)}
+		</div>
+		<div class="space-y-2 text-right">
+			<div class="text-(--side-red)">Red</div>
+			{@render bans(puzzle.red.bans, true)}
 		</div>
 	</div>
-{/snippet}
 
-<div class="grid grid-cols-2 gap-3 sm:gap-6">
-	<div class="space-y-2">
-		<h3 class="text-sm font-bold text-(--side-blue)">Blue side</h3>
-		{@render bans(puzzle.blue.bans)}
-		{#each puzzle.blue.picks as p, i (p.champ)}
-			{@render pickRow(p.champ, p.role, `B${i + 1}`)}
-		{/each}
-	</div>
-	<div class="space-y-2">
-		<h3 class="text-right text-sm font-bold text-(--side-red)">Red side</h3>
-		<div class="flex justify-end">{@render bans(puzzle.red.bans)}</div>
-		{#each puzzle.red.picks as p, i (p.champ)}
-			{@render pickRow(p.champ, p.role, `R${i + 1}`)}
-		{/each}
-		{#if reveal}
-			{@render pickRow(puzzle.answer, puzzle.role, 'R5', true)}
-		{:else}
-			<div class="flex items-center gap-3 rounded-lg p-1.5 ring-2 ring-primary-500">
-				<span class="w-6 text-[10px] opacity-50">R5</span>
-				<div
-					class="flex h-10 w-10 items-center justify-center rounded-md bg-surface-200-800 text-xl font-bold"
-				>
-					?
-				</div>
-				<div>
-					<div class="text-sm font-semibold">Your pick</div>
-					<div class="text-[10px] tracking-wider opacity-60">
-						{roleShort[puzzle.role] ?? puzzle.role} · vs {puzzle.opponent}
+	<ul class="divide-y divide-surface-500/15">
+		{#each roles as role (role)}
+			{@const open = role === puzzle.role && !reveal}
+			{@const target = role === puzzle.role}
+			<li class="grid grid-cols-[1fr_auto_1fr] items-center gap-2 py-1.5">
+				{@render pick(slot('blue', role), false)}
+				<span class="w-9 text-center text-[10px] font-bold tracking-wider opacity-50">
+					{roleShort[role]}
+				</span>
+				{#if open}
+					<div class="flex items-center justify-end gap-2">
+						<span class="text-xs opacity-70">your pick</span>
+						<div
+							class="flex h-10 w-10 items-center justify-center rounded-md preset-filled-primary-500 text-lg font-bold"
+						>
+							?
+						</div>
 					</div>
-				</div>
-			</div>
-		{/if}
-	</div>
+				{:else}
+					<div class={target ? 'rounded-md ring-2 ring-primary-500' : ''}>
+						{@render pick(slot('red', role), true)}
+					</div>
+				{/if}
+			</li>
+		{/each}
+	</ul>
 </div>

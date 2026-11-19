@@ -83,7 +83,7 @@
 		}
 	}
 
-	const matchLabel = { same: 'same class', partial: 'shares a class', none: 'different class' };
+	const matchLabel = { same: 'same', partial: 'partial', none: 'different' };
 	const matchClass = {
 		same: 'preset-filled-warning-500',
 		partial: 'preset-tonal-warning',
@@ -91,22 +91,34 @@
 	};
 </script>
 
-<section class="container mx-auto max-w-3xl space-y-6 px-4 py-8">
-	<p class="text-center text-sm opacity-70">
-		A real pro draft, nine picks in. Guess the last red pick: {MAX_GUESSES} tries.
-	</p>
-
+<section class="container mx-auto max-w-2xl space-y-5 px-4 py-6">
 	{#if loadError}
 		<p class="card preset-tonal-error p-4">Could not load the puzzles: {loadError}</p>
 	{:else if !data || !puzzle || !answer}
 		<p class="text-center opacity-60">Loading…</p>
 	{:else}
-		<div class="flex items-center justify-between text-xs opacity-70">
-			<span>
-				{mode === 'daily' ? `Daily #${day}` : 'Practice'} · patch {puzzle.patch}
-			</span>
-			<span>{over ? '' : `${MAX_GUESSES - guesses.length} tries left`}</span>
-		</div>
+		<header class="flex items-end justify-between gap-4">
+			<div>
+				<h1 class="text-lg font-bold">
+					{mode === 'daily' ? `Daily #${day}` : 'Practice'}
+				</h1>
+				<p class="text-xs opacity-60">
+					Patch {puzzle.patch} · guess the last red pick
+				</p>
+			</div>
+			<div class="flex gap-1" title="{MAX_GUESSES - guesses.length} tries left">
+				{#each { length: MAX_GUESSES }, i (i)}
+					{@const g = guesses[i]}
+					<span
+						class="h-2.5 w-2.5 rounded-full {g === undefined
+							? 'bg-surface-300-700'
+							: g === puzzle.answer
+								? 'bg-success-500'
+								: 'bg-error-500'}"
+					></span>
+				{/each}
+			</div>
+		</header>
 
 		<div class="card preset-tonal-surface p-4">
 			<DraftBoard {puzzle} version={data.version} {byName} reveal={over} />
@@ -116,41 +128,15 @@
 			<GuessInput champions={data.champions} version={data.version} {blocked} onguess={guess} />
 		{/if}
 
-		{#if guessed.length > 0}
-			<ol class="space-y-2">
-				{#each guessed as g (g.name)}
-					{@const m = classMatch(g, answer)}
-					{@const mine = picksInRole(puzzle, g.name)}
-					{@const target = picksInRole(puzzle, answer.name)}
-					<li class="flex items-center gap-3 card preset-tonal-surface p-2">
-						<ChampIcon version={data.version} id={g.id} name={g.name} size={36} />
-						<span class="font-semibold">{g.name}</span>
-						{#if g.name === answer.name}
-							<span class="ml-auto badge preset-filled-success-500">correct</span>
-						{:else}
-							<span class="ml-auto badge {matchClass[m]}">{matchLabel[m]}</span>
-							<span
-								class="badge preset-tonal-surface"
-								title="picks as {puzzle.role} in patch {puzzle.patch}"
-							>
-								{mine}× in {puzzle.patch}
-								{mine === target ? '=' : target > mine ? '↑ more popular' : '↓ less popular'}
-							</span>
-						{/if}
+		{#if hintList.length > 0 && !over}
+			<ol class="space-y-1 card border-l-4 border-primary-500 preset-tonal-surface p-3 text-sm">
+				{#each hintList as h, i (h)}
+					<li class="flex gap-2">
+						<span class="font-bold opacity-60">{i + 1}.</span>
+						<span>{h}</span>
 					</li>
 				{/each}
 			</ol>
-		{/if}
-
-		{#if hintList.length > 0 && !over}
-			<div class="space-y-1 card preset-tonal-primary p-4">
-				<h3 class="text-sm font-bold">Hints</h3>
-				<ul class="list-inside list-disc text-sm">
-					{#each hintList as h (h)}
-						<li>{h}</li>
-					{/each}
-				</ul>
-			</div>
 		{/if}
 
 		{#if over}
@@ -176,6 +162,51 @@
 					{/if}
 					<button class="btn preset-tonal" onclick={practice}>Practice puzzle</button>
 				</div>
+			</div>
+		{/if}
+
+		{#if guessed.length > 0}
+			{@const target = picksInRole(puzzle, answer.name)}
+			<div class="space-y-1">
+				<div
+					class="grid grid-cols-[1fr_6rem_6rem] gap-2 px-2 text-[10px] tracking-wider uppercase opacity-50"
+				>
+					<span>Guess</span>
+					<span class="text-center">Class</span>
+					<span class="text-center" title="picks as {puzzle.role} in patch {puzzle.patch}"
+						>Picks {puzzle.patch}</span
+					>
+				</div>
+				<ol class="space-y-1">
+					{#each guessed as g (g.name)}
+						{@const m = classMatch(g, answer)}
+						{@const mine = picksInRole(puzzle, g.name)}
+						<li
+							class="grid grid-cols-[1fr_6rem_6rem] items-center gap-2 rounded-md bg-surface-100-900 p-1.5"
+						>
+							<span class="flex min-w-0 items-center gap-2">
+								<ChampIcon version={data.version} id={g.id} name={g.name} size={28} />
+								<span class="truncate text-sm font-semibold">{g.name}</span>
+							</span>
+							{#if g.name === answer.name}
+								<span class="col-span-2 badge preset-filled-success-500">correct</span>
+							{:else}
+								<span class="badge {matchClass[m]}">{matchLabel[m]}</span>
+								<span
+									class="badge preset-tonal-surface"
+									title={mine === target
+										? 'same popularity'
+										: target > mine
+											? 'the answer is picked more'
+											: 'the answer is picked less'}
+								>
+									{mine}
+									{mine === target ? '=' : target > mine ? '↑' : '↓'}
+								</span>
+							{/if}
+						</li>
+					{/each}
+				</ol>
 			</div>
 		{/if}
 	{/if}

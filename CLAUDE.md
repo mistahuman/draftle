@@ -39,6 +39,8 @@ does not run Go. Rerun `make export` and commit after `make data`.
 - `src/routes/+page.svelte`: the whole game. Daily puzzle = `dayNumber()` (day 1 is
   2026-11-19 UTC) modulo the puzzle count. The daily state is saved in `localStorage` under
   `draftle:day:<n>`. "Practice puzzle" (shown after the end) picks a random puzzle that is not saved.
+- `DraftBoard.svelte` shows one row per lane (blue pick | role | red pick), so the R5 slot
+  sits next to its lane opponent. Each pick keeps a small B1…R5 label for draft order.
 - `src/lib/game/logic.ts`: rules. 6 tries. Each guess shows class match (Data Dragon
   tags) and whether the answer is more or less picked in that role and patch. One hint
   unlocks per miss (`unlockedHints`): class → picks against the lane opponent → meta rank →
