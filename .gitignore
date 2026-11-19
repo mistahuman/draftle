@@ -1,0 +1,4 @@
+# Leaguepedia API cache and derived data: regenerate with `make data`
+pipeline/data/
+
+.DS_Store
