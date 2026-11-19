@@ -15,9 +15,9 @@ mode and the guess-the-pro-pick mode turned out to be the same game when stopped
 | `pipeline/cmd/fetch` | `make data` → `pipeline/data/drafts.json` (complete drafts only) |
 | `pipeline/internal/stats` | Leave-one-out pick counts by role/patch and by lane opponent; `R5Pool` |
 | `pipeline/internal/ddragon` | Data Dragon champion list (id, name, class tags), cached per version |
-| `pipeline/cmd/export` | `make export` → `web/static/data/puzzles.json`: 365 puzzles from the last 6 patches, shuffled with a fixed seed, plus hint stats and the champion list |
+| `pipeline/cmd/export` | `make export` → `ui/static/data/puzzles.json`: 365 puzzles from the last 6 patches, shuffled with a fixed seed, plus hint stats and the champion list |
 | `pipeline/cmd/spike` | `make spike`: baseline R5 predictability. The yardstick for any scorer |
-| `web/` | Copy of `sveltekit-skeleton-starter`: adapter-static, GitHub Pages under `/draftle` |
+| `ui/` | Copy of `sveltekit-skeleton-starter`: adapter-static, GitHub Pages under `/draftle` |
 
 **Look: simple on purpose, restyled later by Marco.** The theme picker stays, as a testing
 tool. `Logo.svelte` is the starter's placeholder until draftle has its own. No nav: one
@@ -25,11 +25,16 @@ page. Game colours that are not branding live as CSS variables at the bottom of
 `src/routes/layout.css` (`--side-blue`, `--side-red`). Components use theme presets and
 those tokens, never hard-coded colours.
 
+Folder names follow `fullstack-webapp-starter` (`ui/`, later `backend/`), so adding a
+server is additive: `backend/` from `gin-mongodb-starter` + compose + nginx, and `ui/`
+builds as a Node server with `DOCKER_BUILD=true`. Do it only when a feature needs shared
+state (community stats, accounts, leaderboards).
+
 There is **no backend**. The pipeline precomputes everything and writes
-`web/static/data/puzzles.json`, which **is committed**: CI only builds the web app and
+`ui/static/data/puzzles.json`, which **is committed**: CI only builds the web app and
 does not run Go. Rerun `make export` and commit after `make data`.
 
-## The game (web)
+## The game (ui)
 
 - `src/routes/+page.svelte`: the whole game. Daily puzzle = `dayNumber()` (day 1 is
   2026-11-19 UTC) modulo the puzzle count. The daily state is saved in `localStorage` under

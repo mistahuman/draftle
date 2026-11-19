@@ -75,7 +75,7 @@ func die(err error) {
 
 func main() {
 	in := flag.String("in", "data/drafts.json", "drafts written by cmd/fetch")
-	out := flag.String("out", "../web/static/data/puzzles.json", "output file")
+	out := flag.String("out", "../ui/static/data/puzzles.json", "output file")
 	recent := flag.Int("patches", 6, "draw puzzles from the most recent N patches")
 	n := flag.Int("n", 365, "number of puzzles")
 	seed := flag.Int64("seed", 1, "shuffle seed; changing it reorders every daily puzzle")
