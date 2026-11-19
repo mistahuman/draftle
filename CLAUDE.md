@@ -20,9 +20,9 @@ mode and the guess-the-pro-pick mode turned out to be the same game when stopped
 | `ui/` | Copy of `sveltekit-skeleton-starter`: adapter-static, GitHub Pages under `/draftle`. Deploy workflow is **manual only** until launch |
 
 **Look: simple on purpose, restyled later by Marco.** The theme picker stays, as a testing
-tool. Logo: the whole draft as two columns of five slots, the last red one empty
-(`Logo.svelte`, mirrored with hard-coded colours in `static/favicon.svg`). Wordmark in the
-header: `draftl` + an empty dashed red slot, so the last letter is the missing pick. No nav: one
+tool. Logo: a minimap, three lanes, blue base filled and red base still empty
+(`Logo.svelte`, mirrored with hard-coded colours in `static/favicon.svg`). No wordmark:
+plain `draftle` text (a `draftl▢` wordmark was tried and rejected). No nav: one
 page. Game colours that are not branding live as CSS variables at the bottom of
 `src/routes/layout.css` (`--side-blue`, `--side-red`). Components use theme presets and
 those tokens, never hard-coded colours.
