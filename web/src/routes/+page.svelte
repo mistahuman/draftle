@@ -93,12 +93,9 @@
 </script>
 
 <section class="container mx-auto max-w-3xl space-y-6 px-4 py-8">
-	<header class="space-y-1 text-center">
-		<h1 class="h2">draftle</h1>
-		<p class="text-sm opacity-70">
-			A real pro draft, nine picks in. Guess the last red pick: {MAX_GUESSES} tries.
-		</p>
-	</header>
+	<p class="text-center text-sm opacity-70">
+		A real pro draft, nine picks in. Guess the last red pick: {MAX_GUESSES} tries.
+	</p>
 
 	{#if loadError}
 		<p class="card preset-tonal-error p-4">Could not load the puzzles: {loadError}</p>
