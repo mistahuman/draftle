@@ -2,7 +2,7 @@
 	--text-scaling: 1;
 	--typo-base--color-light: var(--color-surface-950);
 	--typo-base--color-dark: var(--color-surface-100);
-	--typo-base--font-family: 'Libre Franklin Variable', ui-sans-serif, system-ui, sans-serif;
+	--typo-base--font-family: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
 	--typo-base--font-size: inherit;
 	--typo-base--line-height: inherit;
 	--typo-base--font-weight: normal;
@@ -10,10 +10,10 @@
 	--typo-base--letter-spacing: 0em;
 	--typo-heading--color-light: inherit;
 	--typo-heading--color-dark: inherit;
-	--typo-heading--font-family: 'Fraunces Variable', ui-serif, Georgia, serif;
+	--typo-heading--font-family: 'Geist Variable', ui-sans-serif, system-ui, sans-serif;
 	--typo-heading--font-weight: 600;
 	--typo-heading--font-style: normal;
-	--typo-heading--letter-spacing: -0.01em;
+	--typo-heading--letter-spacing: -0.025em;
 	--typo-anchor--color-light: var(--color-primary-700);
 	--typo-anchor--color-dark: var(--color-primary-400);
 	--typo-anchor--font-family: inherit;

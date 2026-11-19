@@ -65,11 +65,11 @@
 <div class="space-y-3">
 	<div class="grid grid-cols-2 gap-4">
 		<div class="space-y-1.5">
-			<div class="font-display text-lg font-semibold text-(--side-blue) italic">Blue side</div>
+			<div class="text-sm font-semibold text-(--side-blue)">Blue side</div>
 			{@render bans(puzzle.blue.bans)}
 		</div>
 		<div class="space-y-1.5 text-right">
-			<div class="font-display text-lg font-semibold text-(--side-red) italic">Red side</div>
+			<div class="text-sm font-semibold text-(--side-red)">Red side</div>
 			{@render bans(puzzle.red.bans, true)}
 		</div>
 	</div>
@@ -85,9 +85,9 @@
 				</span>
 				{#if open}
 					<div class="flex items-center justify-end gap-2.5">
-						<span class="font-display text-sm italic opacity-70">your pick</span>
+						<span class="text-sm opacity-60">your pick</span>
 						<div
-							class="flex h-10 w-10 items-center justify-center rounded-base border-2 border-dashed border-(--side-red) font-display text-xl font-semibold text-(--side-red)"
+							class="flex h-10 w-10 items-center justify-center rounded-base border-2 border-dashed border-(--side-red) text-lg font-semibold text-(--side-red)"
 						>
 							?
 						</div>

@@ -20,19 +20,20 @@ mode and the guess-the-pro-pick mode turned out to be the same game when stopped
 | `ui/` | Copy of `sveltekit-skeleton-starter`: adapter-static, GitHub Pages under `/draftle`. Deploy workflow is **manual only** until launch |
 
 **Look: a printed scorecard, vintage rather than new.** One theme, `draftle-theme`
-(`src/lib/styles/draftle-theme.css`): cream paper / warm ink-brown surfaces, brass
-primary (neither blue nor red, which belong to the sides), small radii. Type, all
-self-hosted via fontsource (system stacks fall back to `system-ui` on Linux): Fraunces
-for display (`font-display`), Libre Franklin for text (theme base), Courier Prime for
-figures and labels (`font-mono`); the two utilities are set in `@theme` in `layout.css`.
-Also there: a faint SVG paper grain on `body`. Style vocabulary: thin borders, double and
-dotted rules, outlined "stamp" badges, dashed outline for the R5 slot, a light sepia on
-champion portraits. No theme picker; light/dark switch only. Logo: a minimap, three lanes, blue base filled and red base still empty
-(`Logo.svelte`, mirrored with hard-coded colours in `static/favicon.svg`). No wordmark:
-plain `draftle` text (a `draftl▢` wordmark was tried and rejected). No nav: one
-page. Game colours that are not branding live as CSS variables at the bottom of
-`src/routes/layout.css` (`--side-blue`, `--side-red`). Components use theme presets and
-those tokens, never hard-coded colours.
+(`src/lib/styles/draftle-theme.css`): cream paper / warm ink-brown surfaces, brass primary
+(neither blue nor red, which belong to the sides), small radii. Type: Geist for everything
+and Geist Mono for figures and labels (`font-mono`), self-hosted via fontsource (system
+stacks fall back to `system-ui` on Linux). `font-display` is set in `@theme` in
+`layout.css` and is Geist for now. Tried and rejected: Fraunces serif + Courier Prime,
+with italics, read as generic "AI vintage". Also there: a faint SVG paper grain on `body`.
+Style vocabulary: no italics, thin borders, double and dotted rules, tries as filled
+coloured squares, outlined "stamp" badges, dashed outline for the R5 slot, a light sepia
+on champion portraits. No theme picker; light/dark switch only. Logo: a minimap, three
+lanes, blue base filled and red base still empty (`Logo.svelte`, mirrored with hard-coded
+colours in `static/favicon.svg`). No wordmark: plain `draftle` text (a `draftl▢` wordmark
+was tried and rejected). No nav: one page. Game colours that are not branding live as CSS
+variables at the bottom of `src/routes/layout.css` (`--side-blue`, `--side-red`).
+Components use theme presets and those tokens, never hard-coded colours.
 
 Folder names follow `fullstack-webapp-starter` (`ui/`, later `backend/`), so adding a
 server is additive: `backend/` from `gin-mongodb-starter` + compose + nginx, and `ui/`

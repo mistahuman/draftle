@@ -96,7 +96,7 @@
 	{#if loadError}
 		<p class="card preset-outlined-error-500 p-4">Could not load the puzzles: {loadError}</p>
 	{:else if !data || !puzzle || !answer}
-		<p class="text-center font-display italic opacity-60">Loading…</p>
+		<p class="text-center opacity-60">Loading…</p>
 	{:else}
 		<header
 			class="flex items-end justify-between gap-4 border-b-[3px] border-double border-surface-300-700 pb-3"
@@ -105,24 +105,21 @@
 				<p class="font-mono text-[11px] tracking-[0.2em] uppercase opacity-60">
 					Patch {puzzle.patch}
 				</p>
-				<h1 class="font-display text-3xl font-semibold">
-					{#if mode === 'daily'}Daily <span class="italic">No.</span> {day}{:else}Practice{/if}
+				<h1 class="font-display text-3xl font-semibold tracking-tight">
+					{mode === 'daily' ? `Daily #${day}` : 'Practice'}
 				</h1>
 				<p class="text-sm opacity-70">Nine picks in. Name the last red one.</p>
 			</div>
-			<div class="flex gap-1 pb-1" title="{MAX_GUESSES - guesses.length} tries left">
+			<div class="flex gap-1.5 pb-1" title="{MAX_GUESSES - guesses.length} tries left">
 				{#each { length: MAX_GUESSES }, i (i)}
 					{@const g = guesses[i]}
 					<span
-						class="flex h-5 w-5 items-center justify-center rounded-base border border-surface-400-600 font-mono text-xs font-bold {g ===
-						undefined
-							? ''
+						class="h-4 w-4 rounded-[3px] {g === undefined
+							? 'bg-surface-300-700'
 							: g === puzzle.answer
-								? 'text-success-600-400'
-								: 'text-(--side-red)'}"
-					>
-						{g === undefined ? '' : g === puzzle.answer ? '✓' : '✕'}
-					</span>
+								? 'bg-success-500'
+								: 'bg-(--side-red)'}"
+					></span>
 				{/each}
 			</div>
 		</header>
@@ -157,7 +154,7 @@
 					? 'border-success-500'
 					: 'border-(--side-red)'}"
 			>
-				<p class="font-display text-2xl font-semibold italic">
+				<p class="font-display text-2xl font-semibold tracking-tight">
 					{won ? `Got it in ${guesses.length}.` : `The pro picked ${puzzle.answer}.`}
 				</p>
 				<p class="font-mono text-xs tracking-wide uppercase opacity-60">

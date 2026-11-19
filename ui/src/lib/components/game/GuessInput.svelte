@@ -42,7 +42,7 @@
 
 <div class="relative">
 	<input
-		class="input font-display text-lg placeholder:italic placeholder:opacity-60"
+		class="input text-base placeholder:opacity-60"
 		placeholder="Write a champion…"
 		bind:value={query}
 		{onkeydown}
