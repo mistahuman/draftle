@@ -49,11 +49,14 @@ does not run Go. Rerun `make export` and commit after `make data`.
 - `src/routes/+page.svelte`: the whole game. Daily puzzle = `dayNumber()` (day 1 is
   2026-11-19 UTC) modulo the puzzle count. The daily state is saved in `localStorage` under
   `draftle:day:<n>`. "Practice puzzle" (shown after the end) picks a random puzzle that is not saved.
-- `DraftBoard.svelte` opens with a pick-order strip (B1 R1 R2 B2 B3 R3 | R4 B4 B5 R5, the
-  gap is the second ban phase), then one row per lane (blue pick | role | red pick), so the
-  R5 slot sits next to its lane opponent. Picks are in draft order in the data (Leaguepedia
-  `TeamNPickM`); checked 2026-11-19: R5 is Top in 158/365 puzzles, Support in 71, and only
-  24 red drafts happen to be in role order (Daily #1 is one of them).
+- `DraftBoard.svelte` looks like a broadcast draft: blue left, red right, picks top to
+  bottom in pick order (B1…B5, R1…R5, R5 is the empty slot), bans in two phases (3 + 2),
+  and a gap after the third pick where the second ban phase happens. Each pick shows its
+  role. Picks are in draft order in the data (Leaguepedia `TeamNPickM`); checked
+  2026-11-19: R5 is Top in 158/365 puzzles, Support in 71, and only 24 red drafts happen
+  to be in role order (Daily #1 is one of them). Tried and dropped: lane rows (blue | role
+  | red) and a pick-order strip above them.
+- Bans are always five positions in the JSON, `""` for a skipped ban, so the phases line up.
 - `src/lib/game/logic.ts`: rules. 6 tries. Each guess shows class match (Data Dragon
   tags) and whether the answer is more or less picked in that role and patch. One hint
   unlocks per miss (`unlockedHints`): class → picks against the lane opponent → meta rank →

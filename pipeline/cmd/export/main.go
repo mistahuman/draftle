@@ -58,11 +58,13 @@ func patchKey(p string) [2]int {
 	return k
 }
 
+// cleanBans keeps all five positions, so bans 1-3 stay phase one and 4-5 phase two.
+// A skipped or unknown ban becomes "".
 func cleanBans(bans [5]string) []string {
-	out := []string{}
-	for _, b := range bans {
-		if b != "" && b != "None" && b != "Missing Data" {
-			out = append(out, b)
+	out := make([]string, len(bans))
+	for i, b := range bans {
+		if b != "None" && b != "Missing Data" {
+			out[i] = b
 		}
 	}
 	return out

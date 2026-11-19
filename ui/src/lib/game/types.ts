@@ -13,7 +13,7 @@ export interface Pick {
 
 export interface Side {
 	picks: Pick[];
-	bans: string[];
+	bans: string[]; // always five, in ban order (1-3 phase one, 4-5 phase two); "" = no ban
 }
 
 export interface Puzzle {
