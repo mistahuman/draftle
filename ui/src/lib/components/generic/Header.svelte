@@ -3,8 +3,6 @@
 	import GitHubIcon from '$lib/components/icons/GitHubIcon.svelte';
 	import Logo from '$lib/components/icons/Logo.svelte';
 	import Lightswitch from './Lightswitch.svelte';
-	import ThemeSwitch from './ThemeSwitch.svelte';
-	import { THEME_PICKER, DEFAULT_THEME } from '$lib/config';
 </script>
 
 <!-- Same frame as sveltekit-skeleton-starter (full-width container), without the nav. -->
@@ -20,9 +18,6 @@
 		</a>
 		<div class="flex items-stretch justify-end gap-2">
 			<Lightswitch />
-			{#if THEME_PICKER}
-				<ThemeSwitch defaultTheme={DEFAULT_THEME} />
-			{/if}
 			<span class="border-r border-surface-200-800"></span>
 			<nav class="flex items-center gap-1">
 				<a
