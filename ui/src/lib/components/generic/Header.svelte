@@ -2,6 +2,7 @@
 	import { resolve } from '$app/paths';
 	import GitHubIcon from '$lib/components/icons/GitHubIcon.svelte';
 	import Logo from '$lib/components/icons/Logo.svelte';
+	import HelpDialog from './HelpDialog.svelte';
 	import Lightswitch from './Lightswitch.svelte';
 </script>
 
@@ -17,6 +18,7 @@
 			<span class="font-display text-xl font-semibold tracking-tight">draftle</span>
 		</a>
 		<div class="flex items-stretch justify-end gap-2">
+			<HelpDialog />
 			<Lightswitch />
 			<span class="border-r border-surface-200-800"></span>
 			<nav class="flex items-center gap-1">
