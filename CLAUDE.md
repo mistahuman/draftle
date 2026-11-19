@@ -52,7 +52,7 @@ does not run Go. Rerun `make export` and commit after `make data`.
 - `DraftBoard.svelte` looks like a broadcast draft: blue left, red right, picks top to
   bottom in pick order (B1…B5, R1…R5, R5 is the empty slot), bans in two phases (3 + 2),
   and a gap after the third pick where the second ban phase happens. Each pick shows its
-  role. Picks are in draft order in the data (Leaguepedia `TeamNPickM`); checked
+  role only (no B1…R5 labels: the position is the order). Picks are in draft order in the data (Leaguepedia `TeamNPickM`); checked
   2026-11-19: R5 is Top in 158/365 puzzles, Support in 71, and only 24 red drafts happen
   to be in role order (Daily #1 is one of them). Tried and dropped: lane rows (blue | role
   | red) and a pick-order strip above them.

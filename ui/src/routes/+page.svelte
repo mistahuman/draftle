@@ -102,12 +102,14 @@
 			class="flex items-end justify-between gap-4 border-b-[3px] border-double border-surface-300-700 pb-3"
 		>
 			<div>
-				<p class="font-mono text-[11px] tracking-[0.2em] uppercase opacity-60">
-					Patch {puzzle.patch}
-				</p>
-				<h1 class="font-display text-3xl font-semibold tracking-tight">
-					{mode === 'daily' ? `Daily #${day}` : 'Practice'}
-				</h1>
+				<div class="flex items-center gap-3">
+					<h1 class="font-display text-3xl font-semibold tracking-tight">
+						{mode === 'daily' ? `Daily #${day}` : 'Practice'}
+					</h1>
+					<span class="badge preset-outlined-surface-500 font-mono text-xs">
+						patch {puzzle.patch}
+					</span>
+				</div>
 				<p class="text-sm opacity-70">Nine picks in. Name the last red one.</p>
 			</div>
 			<div class="flex gap-1.5 pb-1" title="{MAX_GUESSES - guesses.length} tries left">

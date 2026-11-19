@@ -54,7 +54,6 @@
 {/snippet}
 
 {#snippet pick(champ: string, role: string, n: number, red: boolean)}
-	{@const label = `${red ? 'R' : 'B'}${n}`}
 	{@const last = red && n === 5}
 	<li
 		class="flex items-center gap-2.5 {red ? 'flex-row-reverse text-right' : ''} {n === 4
@@ -71,7 +70,7 @@
 			</div>
 			<div class="min-w-0 leading-tight">
 				<div class="truncate font-semibold">{champ}</div>
-				<div class="font-mono text-[11px] opacity-50">{label} · {roleShort[role] ?? role}</div>
+				<div class="font-mono text-[11px] opacity-50">{roleShort[role] ?? role}</div>
 			</div>
 		{:else}
 			<div
@@ -82,7 +81,7 @@
 			<div class="min-w-0 leading-tight">
 				<div class="font-semibold text-(--side-red)">Your pick</div>
 				<div class="font-mono text-[11px] opacity-50">
-					{label} · {roleShort[role] ?? role} vs {puzzle.opponent}
+					{roleShort[role] ?? role} vs {puzzle.opponent}
 				</div>
 			</div>
 		{/if}
