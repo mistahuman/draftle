@@ -15,7 +15,7 @@ mode and the guess-the-pro-pick mode turned out to be the same game when stopped
 | `pipeline/cmd/fetch` | `make data` → `pipeline/data/drafts.json` (complete drafts only) |
 | `pipeline/internal/stats` | Leave-one-out pick counts by role/patch and by lane opponent; `R5Pool` |
 | `pipeline/internal/ddragon` | Data Dragon champion list (id, name, class tags), cached per version |
-| `pipeline/cmd/export` | `make export` → `ui/static/data/puzzles.json`: 365 puzzles from the last 6 patches, shuffled with a fixed seed, plus hint stats and the champion list |
+| `pipeline/cmd/export` | `make export` → `ui/static/data/puzzles.json`: 365 puzzles from major games (`draft.Major`) in the last 6 patches that have any, shuffled with a fixed seed, plus hint stats (from every game) and the champion list |
 | `pipeline/cmd/spike` | `make spike`: baseline R5 predictability. The yardstick for any scorer |
 | `ui/` | Copy of `sveltekit-skeleton-starter`: adapter-static, GitHub Pages under `/draftle`. Deploy workflow is **manual only** until launch |
 
@@ -56,12 +56,12 @@ does not run Go. Rerun `make export` and commit after `make data`.
   bottom in pick order (B1…B5, R1…R5, R5 is the empty slot), bans in two phases (3 + 2),
   and a gap after the third pick where the second ban phase happens. Each pick shows its
   role only (no B1…R5 labels: the position is the order). Picks are in draft order in the data (Leaguepedia `TeamNPickM`); checked
-  2026-11-19: R5 is Top in 158/365 puzzles, Support in 71, and only 24 red drafts happen
-  to be in role order (Daily #1 is one of them). Tried and dropped: lane rows (blue | role
+  2026-11-19 on the major-only set: R5 is Top in 148/365 puzzles, Support in 56, Jungle
+  in 27, so the slot order is not role order. Tried and dropped: lane rows (blue | role
   | red) and a pick-order strip above them.
 - After the puzzle, a "who won?" bonus: two buttons with the team names, answer stored under
   `draftle:day:<n>:winner`, one extra line in the share text. Separate from the score on
-  purpose: blue wins 185 of the 365 puzzles, so it is close to a coin flip. Team names
+  purpose: red wins 188 of the 365 puzzles, so it is close to a coin flip. Team names
   (`blueTeam`, `redTeam`, from `ScoreboardGames.Team1/Team2`, Team1 = blue) and the game
   `date` stay hidden on the board until the puzzle ends.
 - Bans are always five positions in the JSON, `""` for a skipped ban, so the phases line up.
@@ -101,6 +101,17 @@ Before writing or changing Skeleton components or classes, read the official LLM
 - Riot API (soloq matchups) is **not used**. A production key would be needed for a
   public app.
 
+## Puzzle source: major games only
+
+Decided 2026-11-19. Puzzles come only from LCK, LPL, LEC, LCS, LCP, CBLOL and the
+international events (Worlds, MSI, First Stand, Esports World Cup main event):
+`draft.Major` on the Leaguepedia tournament page. Before, 296 of 365 puzzles came from
+feeder and regional leagues (the old Daily #1 was a second-division game). That is 2,669
+of 11,072 drafts in 2026. The hint stats still count **every** game: the spike ranks the
+R5 of major games about as well either way (`make spike` with `-major` vs
+`-major-stats`), and the bigger sample keeps per-patch numbers meaningful (vs-opponent
+median 5, zero in 55/365).
+
 ## Baseline (2026-11-19, 11,072 drafts, 30 patches)
 
 How often the real R5 is in the top-k of a ranking. Candidates = champions picked in
@@ -112,6 +123,10 @@ Counts are leave-one-out.
 | meta (patch frequency) | 9.5% | 26.7% | 41.3% | 68.5% |
 | lane opponent (year) | 11.9% | 31.2% | 46.9% | 72.2% |
 | lane opponent + meta | 11.9% | 31.3% | 47.0% | 72.3% |
+
+Major games only (2,669, stats from all games): meta 10.1 / 29.0 / 45.2 / 72.2%,
+lane opponent + meta 13.6 / 35.2 / 51.4 / 76.8%. Slightly more predictable than the
+full set, as expected from teams that follow the same meta.
 
 Reading: knowing the meta alone does not solve the puzzle, so there is a real game.
 Lane opponent adds a little. Only 2.5% of R5s were never picked elsewhere in that

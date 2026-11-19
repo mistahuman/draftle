@@ -49,6 +49,8 @@ var rankings = []ranking{
 
 func main() {
 	in := flag.String("in", "data/drafts.json", "drafts written by cmd/fetch")
+	majorOnly := flag.Bool("major", false, "rank only games from major leagues and international events")
+	majorStats := flag.Bool("major-stats", false, "count picks only in major games (implies -major)")
 	flag.Parse()
 
 	body, err := os.ReadFile(*in)
@@ -62,9 +64,23 @@ func main() {
 		os.Exit(1)
 	}
 
+	var major []draft.Game
+	for _, g := range games {
+		if draft.Major(g.Overview) {
+			major = append(major, g)
+		}
+	}
+	statsGames, ranked := games, games
+	if *majorOnly || *majorStats {
+		ranked = major
+	}
+	if *majorStats {
+		statsGames = major
+	}
+
 	freq := counter{}    // [patch][role][champ]
 	matchup := counter{} // [role][opponent][champ]
-	for _, g := range games {
+	for _, g := range statsGames {
 		for i := 0; i < 5; i++ {
 			freq.add(g.Patch, g.Roles1[i], g.Picks1[i])
 			freq.add(g.Patch, g.Roles2[i], g.Picks2[i])
@@ -78,14 +94,14 @@ func main() {
 	}
 
 	ks := []int{1, 3, 5, 10}
-	fmt.Printf("%d complete drafts\n\n%-28s", len(games), "ranking R5 by")
+	fmt.Printf("%d drafts ranked, stats from %d\n\n%-28s", len(ranked), len(statsGames), "ranking R5 by")
 	for _, k := range ks {
 		fmt.Printf("  top%-3d", k)
 	}
 	fmt.Println()
 	for _, r := range rankings {
 		hits := map[int]int{}
-		for _, g := range games {
+		for _, g := range ranked {
 			role, actual, opp := g.Roles2[4], g.Picks2[4], g.LaneOpponent(2, 4)
 			taken := g.TakenBeforeR5()
 			tot := 0
@@ -127,7 +143,7 @@ func main() {
 		}
 		fmt.Printf("%-28s", r.name)
 		for _, k := range ks {
-			fmt.Printf("  %5.1f%%", 100*float64(hits[k])/float64(len(games)))
+			fmt.Printf("  %5.1f%%", 100*float64(hits[k])/float64(len(ranked)))
 		}
 		fmt.Println()
 	}

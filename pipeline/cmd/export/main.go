@@ -81,7 +81,7 @@ func die(err error) {
 func main() {
 	in := flag.String("in", "data/drafts.json", "drafts written by cmd/fetch")
 	out := flag.String("out", "../ui/static/data/puzzles.json", "output file")
-	recent := flag.Int("patches", 6, "draw puzzles from the most recent N patches")
+	recent := flag.Int("patches", 6, "draw puzzles from the most recent N patches with major games")
 	n := flag.Int("n", 365, "number of puzzles")
 	seed := flag.Int64("seed", 1, "shuffle seed; changing it reorders every daily puzzle")
 	flag.Parse()
@@ -105,9 +105,13 @@ func main() {
 
 	counts := stats.Build(games)
 
+	// Puzzles come from major games only; the hint stats above still count every game,
+	// which keeps the per-patch numbers large enough (the spike ranks R5 as well either way).
 	patches := map[string]bool{}
 	for _, g := range games {
-		patches[g.Patch] = true
+		if draft.Major(g.Overview) {
+			patches[g.Patch] = true
+		}
 	}
 	ordered := make([]string, 0, len(patches))
 	for p := range patches {
@@ -127,7 +131,7 @@ func main() {
 
 	var eligible []draft.Game
 	for _, g := range games {
-		if !keep[g.Patch] {
+		if !keep[g.Patch] || !draft.Major(g.Overview) {
 			continue
 		}
 		ok := true
