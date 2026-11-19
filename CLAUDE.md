@@ -19,10 +19,11 @@ mode and the guess-the-pro-pick mode turned out to be the same game when stopped
 | `pipeline/cmd/spike` | `make spike`: baseline R5 predictability. The yardstick for any scorer |
 | `web/` | Copy of `sveltekit-skeleton-starter`: adapter-static, GitHub Pages under `/draftle` |
 
-**One theme, `mistahuman-theme`, no picker** (2026-11-19). The starter's `ThemeSwitch`,
-`config.ts`, the bundled Skeleton themes and the other custom themes are gone. Only the
-light/dark toggle remains. The header is the wordmark plus the toggle and GitHub, with no nav,
-because the app is one page.
+**Look: simple on purpose, restyled later by Marco.** The theme picker stays, as a testing
+tool. `Logo.svelte` is the starter's placeholder until draftle has its own. No nav: one
+page. Game colours that are not branding live as CSS variables at the bottom of
+`src/routes/layout.css` (`--side-blue`, `--side-red`). Components use theme presets and
+those tokens, never hard-coded colours.
 
 There is **no backend**. The pipeline precomputes everything and writes
 `web/static/data/puzzles.json`, which **is committed**: CI only builds the web app and

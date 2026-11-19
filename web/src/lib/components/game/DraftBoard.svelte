@@ -48,14 +48,14 @@
 
 <div class="grid grid-cols-2 gap-3 sm:gap-6">
 	<div class="space-y-2">
-		<h3 class="text-sm font-bold text-[#3b82f6]">Blue side</h3>
+		<h3 class="text-sm font-bold text-(--side-blue)">Blue side</h3>
 		{@render bans(puzzle.blue.bans)}
 		{#each puzzle.blue.picks as p, i (p.champ)}
 			{@render pickRow(p.champ, p.role, `B${i + 1}`)}
 		{/each}
 	</div>
 	<div class="space-y-2">
-		<h3 class="text-right text-sm font-bold text-[#ef4444]">Red side</h3>
+		<h3 class="text-right text-sm font-bold text-(--side-red)">Red side</h3>
 		<div class="flex justify-end">{@render bans(puzzle.red.bans)}</div>
 		{#each puzzle.red.picks as p, i (p.champ)}
 			{@render pickRow(p.champ, p.role, `R${i + 1}`)}
