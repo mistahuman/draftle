@@ -14,7 +14,7 @@
 	>
 		<a href={resolve('/')} class="flex items-center gap-2" title="draftle">
 			<Logo width="32" height="32" />
-			<span class="text-xl font-bold tracking-tight">draftle</span>
+			<span class="font-display text-2xl font-semibold italic">draftle</span>
 		</a>
 		<div class="flex items-stretch justify-end gap-2">
 			<Lightswitch />

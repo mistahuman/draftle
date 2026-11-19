@@ -3,7 +3,9 @@
 </script>
 
 <footer class="border-t-[1px] border-surface-500/20 {classList}">
-	<div class="container mx-auto flex flex-col items-center gap-2 text-center text-xs opacity-60">
+	<div
+		class="container mx-auto flex flex-col items-center gap-2 text-center font-mono text-[11px] opacity-60"
+	>
 		<p>
 			built by <a class="underline" href="https://www.github.com/mistahuman" target="_blank"
 				>mistahuman</a

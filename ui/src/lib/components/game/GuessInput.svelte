@@ -42,8 +42,8 @@
 
 <div class="relative">
 	<input
-		class="input"
-		placeholder="Type a champion…"
+		class="input font-display text-lg placeholder:italic placeholder:opacity-60"
+		placeholder="Write a champion…"
 		bind:value={query}
 		{onkeydown}
 		autocomplete="off"
@@ -51,7 +51,7 @@
 	/>
 	{#if matches.length > 0}
 		<ul
-			class="absolute z-10 mt-1 w-full overflow-hidden card preset-filled-surface-100-900 p-1 shadow-xl"
+			class="absolute z-10 mt-1 w-full overflow-hidden rounded-container border border-surface-300-700 bg-surface-50-950 p-1 shadow-lg"
 		>
 			{#each matches as c (c.id)}
 				<li>
@@ -61,8 +61,8 @@
 						onclick={() => choose(c)}
 					>
 						<ChampIcon {version} id={c.id} name={c.name} size={28} />
-						<span class="text-sm">{c.name}</span>
-						<span class="ml-auto text-[10px] opacity-50">{c.tags.join(' / ')}</span>
+						<span class="font-semibold">{c.name}</span>
+						<span class="ml-auto font-mono text-[11px] opacity-50">{c.tags.join(' / ')}</span>
 					</button>
 				</li>
 			{/each}

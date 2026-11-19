@@ -19,11 +19,15 @@ mode and the guess-the-pro-pick mode turned out to be the same game when stopped
 | `pipeline/cmd/spike` | `make spike`: baseline R5 predictability. The yardstick for any scorer |
 | `ui/` | Copy of `sveltekit-skeleton-starter`: adapter-static, GitHub Pages under `/draftle`. Deploy workflow is **manual only** until launch |
 
-**Look: simple on purpose.** One theme, `draftle-theme` (`src/lib/styles/draftle-theme.css`):
-slate surfaces, gold primary (neither blue nor red, which belong to the sides), Inter
-self-hosted via `@fontsource-variable/inter` (a system font stack falls back to `system-ui`
-on Linux). No theme picker; light/dark switch only. The theme was generated as OKLCH ramps,
-with surface chroma rising toward the dark end so light mode stays neutral grey. Logo: a minimap, three lanes, blue base filled and red base still empty
+**Look: a printed scorecard, vintage rather than new.** One theme, `draftle-theme`
+(`src/lib/styles/draftle-theme.css`): cream paper / warm ink-brown surfaces, brass
+primary (neither blue nor red, which belong to the sides), small radii. Type, all
+self-hosted via fontsource (system stacks fall back to `system-ui` on Linux): Fraunces
+for display (`font-display`), Libre Franklin for text (theme base), Courier Prime for
+figures and labels (`font-mono`); the two utilities are set in `@theme` in `layout.css`.
+Also there: a faint SVG paper grain on `body`. Style vocabulary: thin borders, double and
+dotted rules, outlined "stamp" badges, dashed outline for the R5 slot, a light sepia on
+champion portraits. No theme picker; light/dark switch only. Logo: a minimap, three lanes, blue base filled and red base still empty
 (`Logo.svelte`, mirrored with hard-coded colours in `static/favicon.svg`). No wordmark:
 plain `draftle` text (a `draftl▢` wordmark was tried and rejected). No nav: one
 page. Game colours that are not branding live as CSS variables at the bottom of

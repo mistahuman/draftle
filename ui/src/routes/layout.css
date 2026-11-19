@@ -4,7 +4,10 @@
 
 @import '@skeletonlabs/skeleton';
 @import '@skeletonlabs/skeleton-svelte';
-@import '@fontsource-variable/inter';
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/libre-franklin';
+@import '@fontsource/courier-prime/400.css';
+@import '@fontsource/courier-prime/700.css';
 @import '../lib/styles/draftle-theme.css';
 
 @source '../../node_modules/@skeletonlabs/skeleton-svelte/dist';
@@ -18,16 +21,37 @@ html,
 body {
 	margin: 0;
 	width: 100%;
+}
+
+html {
 	height: 100%;
+}
+
+/* min-height, not height: the paper grain must cover pages taller than the viewport. */
+body {
+	min-height: 100%;
 }
 
 html {
 	scroll-behavior: smooth;
 }
 
+/* Type: Fraunces for display, Libre Franklin for text (theme), Courier Prime for figures
+   and labels, like a typed scorecard. `font-display` and `font-mono` utilities. */
+@theme {
+	--font-display: 'Fraunces Variable', ui-serif, Georgia, serif;
+	--font-mono: 'Courier Prime', ui-monospace, monospace;
+}
+
+/* Paper grain: a faint noise over the page background, both modes. */
+body {
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.4 0 0 0 0 0.3 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
 /* Game tokens: draft side colours. Theme-independent on purpose, since blue and red
-   are game semantics, not branding. Restyle here, not in components. */
+   are game semantics, not branding. Faded, like printed ink. Restyle here, not in
+   components. */
 :root {
-	--side-blue: #3b82f6;
-	--side-red: #ef4444;
+	--side-blue: oklch(55% 0.1 250);
+	--side-red: oklch(55% 0.15 30);
 }

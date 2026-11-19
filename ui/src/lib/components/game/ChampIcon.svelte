@@ -16,11 +16,13 @@
 		width={size}
 		height={size}
 		loading="lazy"
-		class="rounded-md {dim ? 'opacity-40 grayscale' : ''}"
+		class="rounded-base ring-1 ring-surface-950/25 {dim
+			? 'opacity-40 grayscale'
+			: 'saturate-[.9] sepia-[.15]'}"
 	/>
 {:else}
 	<div
-		class="flex items-center justify-center rounded-md bg-surface-200-800 text-xs"
+		class="flex items-center justify-center rounded-base bg-surface-200-800 font-mono text-xs"
 		style="width:{size}px;height:{size}px"
 		title={name}
 	>
