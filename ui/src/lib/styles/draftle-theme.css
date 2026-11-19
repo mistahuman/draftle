@@ -185,7 +185,7 @@
 	--color-surface-500: oklch(55% 0.014 255deg);
 	--color-surface-600: oklch(45% 0.016 255deg);
 	--color-surface-700: oklch(35% 0.018 255deg);
-	--color-surface-800: oklch(27% 0.020 255deg);
+	--color-surface-800: oklch(27% 0.02 255deg);
 	--color-surface-900: oklch(21% 0.021 255deg);
 	--color-surface-950: oklch(16.5% 0.022 255deg);
 	--color-surface-contrast-dark: var(--color-surface-950);
