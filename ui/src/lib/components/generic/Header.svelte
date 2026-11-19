@@ -7,27 +7,33 @@
 	import { THEME_PICKER, DEFAULT_THEME } from '$lib/config';
 </script>
 
+<!-- Same frame as sveltekit-skeleton-starter (full-width container), without the nav. -->
 <header
-	class="sticky top-0 z-50 flex h-14 w-full items-center border-b-[1px] border-surface-500/20 bg-surface-50/90 backdrop-blur dark:bg-surface-950/90"
+	class="sticky top-0 z-50 flex h-[70px] w-full items-center border-b-[1px] border-surface-500/20 bg-surface-50/90 backdrop-blur dark:bg-surface-950/90"
 >
-	<div class="container mx-auto flex max-w-3xl items-center justify-between px-4">
+	<div
+		class="container mx-auto flex max-w-screen-2xl items-center justify-between gap-4 px-4 xl:px-10"
+	>
 		<a href={resolve('/')} class="flex items-center gap-2" title="draftle">
-			<Logo width="28" height="28" />
+			<Logo width="32" height="32" />
 			<span class="text-xl font-bold tracking-tight">draftle</span>
 		</a>
-		<div class="flex items-center gap-1">
+		<div class="flex items-stretch justify-end gap-2">
 			<Lightswitch />
 			{#if THEME_PICKER}
 				<ThemeSwitch defaultTheme={DEFAULT_THEME} />
 			{/if}
-			<a
-				class="btn-icon hover:preset-tonal"
-				href="https://github.com/mistahuman"
-				rel="external"
-				title="GitHub"
-			>
-				<GitHubIcon size={20} />
-			</a>
+			<span class="border-r border-surface-200-800"></span>
+			<nav class="flex items-center gap-1">
+				<a
+					class="btn-icon hover:preset-tonal"
+					href="https://github.com/mistahuman"
+					rel="external"
+					title="GitHub"
+				>
+					<GitHubIcon size={20} />
+				</a>
+			</nav>
 		</div>
 	</div>
 </header>
