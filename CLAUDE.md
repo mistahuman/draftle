@@ -17,7 +17,7 @@ mode and the guess-the-pro-pick mode turned out to be the same game when stopped
 | `pipeline/internal/ddragon` | Data Dragon champion list (id, name, class tags), cached per version |
 | `pipeline/cmd/export` | `make export` → `ui/static/data/puzzles.json`: 365 puzzles from major games (`draft.Major`) in the last 6 patches that have any, shuffled with a fixed seed, plus hint stats (from every game) and the champion list |
 | `pipeline/cmd/spike` | `make spike`: baseline R5 predictability. The yardstick for any scorer |
-| `ui/` | Copy of `sveltekit-skeleton-starter`: adapter-static, GitHub Pages under `/draftle`. Deploy workflow is **manual only** until launch |
+| `ui/` | Copy of `sveltekit-skeleton-starter`: adapter-static, GitHub Pages under `/draftle`. Live at `mistahuman.github.io/draftle/` (soft launch, not announced). Deploy workflow is **manual only** (`gh workflow run deploy.yml`) until launch |
 
 **Look: a printed scorecard, vintage rather than new.** One theme, `draftle-theme`
 (`src/lib/styles/draftle-theme.css`): cream paper / warm ink-brown surfaces, brass primary
