@@ -65,16 +65,19 @@ does not run Go. Rerun `make export` and commit after `make data`.
   (`blueTeam`, `redTeam`, from `ScoreboardGames.Team1/Team2`, Team1 = blue) and the game
   `date` stay hidden on the board until the puzzle ends.
 - Bans are always five positions in the JSON, `""` for a skipped ban, so the phases line up.
-- `src/lib/game/logic.ts`: rules. **Unlimited tries, five clues** (decided 2026-11-20). The
-  five squares in the header are the clues: each of the first five misses fills one and
-  unlocks the next clue; after that the player keeps guessing, and a "Give up" button
+- `src/lib/game/logic.ts`: rules. **Unlimited tries, five hints** (decided 2026-11-20). The
+  five squares in the header are the hints: each of the first five misses fills one and
+  unlocks the next hint; after that the player keeps guessing, and a "Give up" button
   appears (`draftle:day:<n>:gaveup`). Each guess shows class match (Data Dragon tags) and
-  whether the answer is more or less picked in that role and patch. Clues, weakest first:
-  class → melee/ranged → picks against the lane opponent → popularity band (top 5 / top 15
-  / outside / pocket pick, not the exact rank) → how often the red team played it in that
-  role this year (`teamPicks`, leave-one-out). Dropped as too strong: first letter and
-  "one of three". Damage type was tried and dropped: Data Dragon's attack/magic ratings
-  call Hwei, Vex or Fizz "mixed". The share text is "N tries · k/5 clues" or "gave up".
+  whether the answer is more or less picked in that role and patch. `HintGrid.svelte`
+  shows all five boxes from the start (label visible, value locked, dashed) and opens them
+  all at the end. Hints, weakest first: class → priority (% of the patch's games where it
+  was picked or banned) → pick timing (share of its picks that were 4th/5th: counter ≥55%,
+  early ≤30%, else flexible) → games against the lane opponent → games the red team played
+  it in that role this year. All counts leave this game out. Tried and dropped: first
+  letter and "one of three" (too strong), melee/ranged (says nothing for a Bot), popularity
+  band (repeats the ↑↓ arrows), damage type (Data Dragon's ratings call Hwei, Vex or Fizz
+  "mixed"). Called "hints", not "clues". Share text: "N tries · k/5 hints" or "gave up".
 - **Every number the player sees is per patch** (popularity, picks vs lane opponent, meta
   rank), except the team clue, which counts the whole year. `stats.Counts` counts per patch for that reason. Per patch, the vs-opponent count
   for an answer has a median of 4 and is 0 in about 20% of puzzles, and a 0 is a hint too.

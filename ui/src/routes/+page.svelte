@@ -4,8 +4,10 @@
 	import DraftBoard from '$lib/components/game/DraftBoard.svelte';
 	import GuessInput from '$lib/components/game/GuessInput.svelte';
 	import ChampIcon from '$lib/components/game/ChampIcon.svelte';
+	import HintGrid from '$lib/components/game/HintGrid.svelte';
 	import {
-		CLUES,
+		HINTS,
+		hints,
 		classMatch,
 		dailyIndex,
 		dayNumber,
@@ -59,7 +61,8 @@
 	let won = $derived(!!puzzle && guesses.includes(puzzle.answer));
 	let over = $derived(won || gaveUp);
 	let misses = $derived(guesses.filter((g) => g !== puzzle?.answer).length);
-	let hintList = $derived(puzzle && answer ? unlockedHints(puzzle, answer, guessed) : []);
+	let hintList = $derived(puzzle && answer ? hints(puzzle, answer) : []);
+	let unlocked = $derived(puzzle ? unlockedHints(guesses, puzzle.answer) : 0);
 	let blueName = $derived(puzzle?.blueTeam || 'Blue side');
 	let redName = $derived(puzzle?.redTeam || 'Red side');
 	let blocked = $derived(new Set([...(puzzle ? takenInDraft(puzzle) : []), ...guesses]));
@@ -173,8 +176,8 @@
 						{guesses.length === 1 ? 'try' : 'tries'}
 					</span>
 				{/if}
-				<div class="flex gap-1.5" title="{Math.min(misses, CLUES)} of {CLUES} clues unlocked">
-					{#each { length: CLUES }, i (i)}
+				<div class="flex gap-1.5" title="{unlocked} of {HINTS} hints unlocked">
+					{#each { length: HINTS }, i (i)}
 						<span
 							class="h-4 w-4 rounded-[3px] {i < misses
 								? 'bg-(--side-red)'
@@ -195,27 +198,13 @@
 
 		{#if !over}
 			<GuessInput champions={data.champions} version={data.version} {blocked} onguess={guess} />
-			{#if misses >= CLUES}
+			{#if misses >= HINTS}
 				<div class="flex justify-end">
 					<button class="btn preset-outlined-surface-500 opacity-70 btn-sm" onclick={giveUp}>
 						Give up and show the pick
 					</button>
 				</div>
 			{/if}
-		{/if}
-
-		{#if hintList.length > 0 && !over}
-			<div class="space-y-1.5 border-l-2 border-dashed border-primary-500 pl-4">
-				<p class="font-mono text-[11px] tracking-[0.2em] uppercase opacity-60">Clues</p>
-				<ol class="space-y-1">
-					{#each hintList as h, i (h)}
-						<li class="flex gap-2">
-							<span class="font-mono text-sm opacity-50">{i + 1}.</span>
-							<span>{h}</span>
-						</li>
-					{/each}
-				</ol>
-			</div>
 		{/if}
 
 		{#if over}
@@ -282,6 +271,8 @@
 				</div>
 			</div>
 		{/if}
+
+		<HintGrid hints={hintList} unlocked={over ? HINTS : unlocked} />
 
 		{#if guessed.length > 0}
 			{@const target = picksInRole(puzzle, answer.name)}

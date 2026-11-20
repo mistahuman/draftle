@@ -60,7 +60,7 @@
 								<span class="h-3 w-3 rounded-[2px] bg-(--side-red)"></span>
 								<span class="h-3 w-3 rounded-[2px] bg-success-500"></span>
 							</span>
-							<span>Unlimited tries. Your first five misses each unlock a clue.</span>
+							<span>Unlimited tries. Your first five misses each unlock a hint.</span>
 						</li>
 						<li>
 							<span class="badge preset-outlined-primary-500 font-mono text-[11px] font-bold"

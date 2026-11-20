@@ -1,7 +1,7 @@
 import type { Champion, Puzzle } from './types';
 
-// Unlimited tries; each of the first five misses unlocks one clue.
-export const CLUES = 5;
+// Unlimited tries; each of the first five misses unlocks one hint.
+export const HINTS = 5;
 
 // Day 1 is the launch day. Daily puzzles cycle through the exported set.
 const EPOCH = Date.UTC(2026, 10, 19);
@@ -36,32 +36,56 @@ export function takenInDraft(p: Puzzle): Set<string> {
 	]);
 }
 
-// One clue per miss, weakest first, five in all. Every number is scoped to the puzzle's
-// patch except the team clue, which looks at the whole year. Nothing names or narrows
-// the answer to a short list: the old "first letter" and "one of three" clues are gone.
-export function unlockedHints(p: Puzzle, answer: Champion, guesses: Champion[]): string[] {
+export interface Hint {
+	label: string;
+	value: string;
+	note: string;
+}
+
+// The five hints, weakest first. One unlocks per miss. Every number is per patch except
+// the team hint (whole year), and every count leaves this game out. Nothing names or
+// narrows the answer to a short list.
+export function hints(p: Puzzle, answer: Champion): Hint[] {
 	const vs = p.stats[p.answer]?.[1] ?? 0;
-	const r = p.metaRank;
-	const role = p.role;
-	const clues = [
-		`Class: ${answer.tags.join(' / ')}.`,
-		`It is a ${answer.range} champion.`,
-		vs > 0
-			? `In patch ${p.patch} it was picked as ${role} against ${p.opponent} ${vs} other time${vs === 1 ? '' : 's'}.`
-			: `In patch ${p.patch} nobody else picked it as ${role} against ${p.opponent}.`,
-		r === 0
-			? `Nobody else picked it as ${role} in patch ${p.patch}: a pocket pick.`
-			: r <= 5
-				? `It is one of the 5 most picked ${role}s of patch ${p.patch}.`
-				: r <= 15
-					? `It is not a top 5 ${role} of patch ${p.patch}, but it is in the top 15.`
-					: `It is outside the top 15 ${role}s of patch ${p.patch}.`,
-		p.teamPicks > 0
-			? `${p.redTeam} played it as ${role} in ${p.teamPicks} other game${p.teamPicks === 1 ? '' : 's'} this year.`
-			: `${p.redTeam} never played it as ${role} in another game this year.`
+	const share = p.picks > 0 ? p.late / p.picks : 0;
+	const s = (n: number, word: string) => `${n} ${word}${n === 1 ? '' : 's'}`;
+	return [
+		{ label: 'Class', value: answer.tags.join(' / '), note: "Riot's class tag" },
+		{
+			label: 'Priority',
+			value: `${p.presence}%`,
+			note: `of patch ${p.patch} games: picked or banned`
+		},
+		{
+			label: 'Pick timing',
+			value:
+				p.picks === 0
+					? 'Unseen'
+					: share >= 0.55
+						? 'Counter pick'
+						: share <= 0.3
+							? 'Early pick'
+							: 'Flexible',
+			note:
+				p.picks === 0
+					? `never picked elsewhere in patch ${p.patch}`
+					: `${p.late} of its ${s(p.picks, 'pick')} came 4th or 5th`
+		},
+		{
+			label: `vs ${p.opponent}`,
+			value: s(vs, 'game'),
+			note: `as ${p.role} against ${p.opponent}, patch ${p.patch}`
+		},
+		{
+			label: p.redTeam || 'Red team',
+			value: s(p.teamPicks, 'game'),
+			note: `played it as ${p.role} this year`
+		}
 	];
-	const misses = guesses.filter((g) => g.name !== answer.name).length;
-	return clues.slice(0, Math.min(misses, CLUES));
+}
+
+export function unlockedHints(guesses: string[], answer: string): number {
+	return Math.min(guesses.filter((g) => g !== answer).length, HINTS);
 }
 
 export function shareText(
@@ -77,10 +101,12 @@ export function shareText(
 			return { same: '🟨', partial: '🟧', none: '⬛' }[classMatch(g, answer)];
 		})
 		.join('');
-	const misses = guesses.filter((g) => g.name !== answer.name).length;
-	const clues = Math.min(misses, CLUES);
+	const used = unlockedHints(
+		guesses.map((g) => g.name),
+		answer.name
+	);
 	const head = won
-		? `${guesses.length} ${guesses.length === 1 ? 'try' : 'tries'} · ${clues}/${CLUES} clues`
+		? `${guesses.length} ${guesses.length === 1 ? 'try' : 'tries'} · ${used}/${HINTS} hints`
 		: `gave up after ${guesses.length}`;
 	const bonus = calledWinner === undefined ? '' : `\nwinner ${calledWinner ? '✅' : '❌'}`;
 	return `draftle #${day} · ${head}\n${squares}${bonus}`;

@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"math"
 	"math/rand"
 	"os"
 	"sort"
@@ -44,9 +45,15 @@ type puzzle struct {
 	MetaRank int    `json:"metaRank"` // answer's rank in the pool, 0 if absent
 	// TeamPicks: how often the red team played the answer in R5's role in other games
 	// this year, any patch.
-	TeamPicks int               `json:"teamPicks"`
-	PoolSize  int               `json:"poolSize"`
-	Stats     map[string][2]int `json:"stats"` // champ → [freq, vsOpp], pool only
+	TeamPicks int `json:"teamPicks"`
+	// Presence: % of the patch's other games where the answer was picked or banned.
+	Presence int `json:"presence"`
+	// Late: of the answer's other picks this patch, how many were in the last rotation
+	// (4th or 5th pick of either side), out of Picks.
+	Late     int               `json:"late"`
+	Picks    int               `json:"picks"`
+	PoolSize int               `json:"poolSize"`
+	Stats    map[string][2]int `json:"stats"` // champ → [freq, vsOpp], pool only
 }
 
 type output struct {
@@ -129,6 +136,36 @@ func main() {
 		}
 	}
 
+	// Per patch, for the priority and pick-timing hints: games per patch, games where a
+	// champion was picked or banned, and its picks split by rotation.
+	type patchChamp struct{ patch, champ string }
+	patchGames := map[string]int{}
+	present := map[patchChamp]int{}
+	picked := map[patchChamp]int{}
+	late := map[patchChamp]int{}
+	for _, g := range games {
+		patchGames[g.Patch]++
+		seen := map[string]bool{}
+		for i := 0; i < 5; i++ {
+			for _, c := range []string{g.Picks1[i], g.Picks2[i]} {
+				k := patchChamp{g.Patch, c}
+				picked[k]++
+				if i >= 3 {
+					late[k]++
+				}
+				seen[c] = true
+			}
+			for _, c := range []string{g.Bans1[i], g.Bans2[i]} {
+				if c != "" {
+					seen[c] = true
+				}
+			}
+		}
+		for c := range seen {
+			present[patchChamp{g.Patch, c}]++
+		}
+	}
+
 	// Puzzles come from major games only; the hint stats above still count every game,
 	// which keeps the per-patch numbers large enough (the spike ranks R5 as well either way).
 	patches := map[string]bool{}
@@ -187,8 +224,14 @@ func main() {
 			Opponent: g.LaneOpponent(2, 4),
 			// leave-one-out: this game's own R5 is not counted
 			TeamPicks: teamPicks[g.Team2][g.Roles2[4]][g.Picks2[4]] - 1,
+			Late:      late[patchChamp{g.Patch, g.Picks2[4]}] - 1, // R5 is itself a late pick
+			Picks:     picked[patchChamp{g.Patch, g.Picks2[4]}] - 1,
 			PoolSize:  len(pool),
 			Stats:     map[string][2]int{},
+		}
+		if others := patchGames[g.Patch] - 1; others > 0 {
+			k := patchChamp{g.Patch, g.Picks2[4]}
+			p.Presence = int(math.Round(100 * float64(present[k]-1) / float64(others)))
 		}
 		for i := 0; i < 5; i++ {
 			p.Blue.Picks = append(p.Blue.Picks, pick{g.Picks1[i], g.Roles1[i]})

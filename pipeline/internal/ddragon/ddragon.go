@@ -18,26 +18,6 @@ type Champion struct {
 	ID   string   `json:"id"`   // asset id, e.g. "Kaisa"
 	Name string   `json:"name"` // display name, matches Leaguepedia, e.g. "Kai'Sa"
 	Tags []string `json:"tags"` // classes, e.g. ["Marksman"]
-	// Range is "melee" or "ranged" (base attack range under 300 is melee).
-	Range string `json:"range"`
-}
-
-type rawChampion struct {
-	ID    string   `json:"id"`
-	Name  string   `json:"name"`
-	Tags  []string `json:"tags"`
-	Stats struct {
-		AttackRange float64 `json:"attackrange"`
-	} `json:"stats"`
-}
-
-func (r rawChampion) champion() Champion {
-	// No damage type: Data Dragon's attack/magic ratings call Hwei, Vex or Fizz "mixed".
-	c := Champion{ID: r.ID, Name: r.Name, Tags: r.Tags, Range: "melee"}
-	if r.Stats.AttackRange >= 300 {
-		c.Range = "ranged"
-	}
-	return c
 }
 
 func get(url string) ([]byte, error) {
@@ -79,14 +59,14 @@ func Load(cacheDir string) (string, []Champion, error) {
 		}
 	}
 	var r struct {
-		Data map[string]rawChampion `json:"data"`
+		Data map[string]Champion `json:"data"`
 	}
 	if err := json.Unmarshal(body, &r); err != nil {
 		return "", nil, err
 	}
 	champs := make([]Champion, 0, len(r.Data))
 	for _, c := range r.Data {
-		champs = append(champs, c.champion())
+		champs = append(champs, c)
 	}
 	sort.Slice(champs, func(i, j int) bool { return champs[i].Name < champs[j].Name })
 	return version, champs, nil
