@@ -70,8 +70,10 @@ does not run Go. Rerun `make export` and commit after `make data`.
   unlocks the next hint; after that the player keeps guessing, and a "Give up" button
   appears (`draftle:day:<n>:gaveup`). Each guess shows class match (Data Dragon tags) and
   whether the answer is more or less picked in that role and patch. `HintGrid.svelte`
-  shows all five boxes from the start (label visible, value locked, dashed) and opens them
-  all at the end. Hints, weakest first: class → priority (% of the patch's games where it
+  shows only the unlocked hints (all five at the end): locked placeholders were tried and
+  dropped because their labels leaked the lane opponent and the red team's name, which the
+  board hides until the end. `GuessList.svelte`: newest guess first, each with a Class and
+  a Picks tile in the same style as the hint boxes. Hints, weakest first: class → priority (% of the patch's games where it
   was picked or banned) → pick timing (share of its picks that were 4th/5th: counter ≥55%,
   early ≤30%, else flexible) → games against the lane opponent → games the red team played
   it in that role this year. All counts leave this game out. Tried and dropped: first

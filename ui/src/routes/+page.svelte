@@ -3,15 +3,13 @@
 	import { asset } from '$app/paths';
 	import DraftBoard from '$lib/components/game/DraftBoard.svelte';
 	import GuessInput from '$lib/components/game/GuessInput.svelte';
-	import ChampIcon from '$lib/components/game/ChampIcon.svelte';
+	import GuessList from '$lib/components/game/GuessList.svelte';
 	import HintGrid from '$lib/components/game/HintGrid.svelte';
 	import {
 		HINTS,
 		hints,
-		classMatch,
 		dailyIndex,
 		dayNumber,
-		picksInRole,
 		shareText,
 		takenInDraft,
 		unlockedHints
@@ -139,14 +137,6 @@
 			year: 'numeric',
 			timeZone: 'UTC'
 		});
-
-	const matchLabel = { same: 'same', partial: 'partial', none: 'different' };
-	// Stamped labels: outline only, like a rubber stamp on the scorecard.
-	const matchClass = {
-		same: 'preset-outlined-primary-500 font-bold',
-		partial: 'preset-outlined-surface-500',
-		none: 'opacity-40'
-	};
 </script>
 
 <section class="container mx-auto max-w-2xl space-y-6 px-4 py-8">
@@ -272,57 +262,12 @@
 			</div>
 		{/if}
 
-		<HintGrid hints={hintList} unlocked={over ? HINTS : unlocked} />
+		{#if over || unlocked > 0}
+			<HintGrid hints={hintList.slice(0, over ? HINTS : unlocked)} />
+		{/if}
 
 		{#if guessed.length > 0}
-			{@const target = picksInRole(puzzle, answer.name)}
-			<div>
-				<div
-					class="grid grid-cols-[1fr_6rem_5rem] gap-2 border-b border-surface-300-700 px-1 pb-1 font-mono text-[11px] tracking-widest uppercase opacity-60"
-				>
-					<span>Guess</span>
-					<span class="text-center">Class</span>
-					<span class="text-right" title="picks as {puzzle.role} in patch {puzzle.patch}"
-						>Picks</span
-					>
-				</div>
-				<ol class="divide-y divide-dotted divide-surface-400-600">
-					{#each guessed as g, i (g.name)}
-						{@const m = classMatch(g, answer)}
-						{@const mine = picksInRole(puzzle, g.name)}
-						<li class="grid grid-cols-[1fr_6rem_5rem] items-center gap-2 px-1 py-1.5">
-							<span class="flex min-w-0 items-center gap-2">
-								<span class="w-4 font-mono text-xs opacity-40">{i + 1}</span>
-								<ChampIcon version={data.version} id={g.id} name={g.name} size={28} />
-								<span class="truncate font-semibold">{g.name}</span>
-							</span>
-							{#if g.name === answer.name}
-								<span
-									class="col-span-2 badge justify-self-end preset-outlined-success-500 font-mono font-bold uppercase"
-									>correct</span
-								>
-							{:else}
-								<span
-									class="badge justify-self-center font-mono text-[11px] uppercase {matchClass[m]}"
-									>{matchLabel[m]}</span
-								>
-								<span
-									class="text-right font-mono text-sm"
-									title={mine === target
-										? 'same popularity'
-										: target > mine
-											? 'the answer is picked more'
-											: 'the answer is picked less'}
-								>
-									{mine}
-									<span class="opacity-60">{mine === target ? '=' : target > mine ? '↑' : '↓'}</span
-									>
-								</span>
-							{/if}
-						</li>
-					{/each}
-				</ol>
-			</div>
+			<GuessList guesses={guessed} {answer} {puzzle} version={data.version} />
 		{/if}
 	{/if}
 </section>
