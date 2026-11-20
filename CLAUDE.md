@@ -31,7 +31,9 @@ coloured squares, outlined "stamp" badges, dashed outline for the R5 slot, a lig
 on champion portraits. No theme picker; light/dark switch only. Logo: a minimap, three
 lanes, blue base filled and red base still empty (`Logo.svelte`, mirrored with hard-coded
 colours in `static/favicon.svg`). No wordmark: plain `draftle` text (a `draftl▢` wordmark
-was tried and rejected). No nav: one page. Rules, data source and credits live in a
+was tried and rejected). No nav: one page. No page heading either: above the board there are only the five hint
+squares (plus a `practice` badge in practice mode), and the patch sits on the board's
+top frame. "Daily #N" and a subtitle were tried and dropped as noise. Rules, data source and credits live in a
 "How to play" Skeleton Dialog (`generic/HelpDialog.svelte`, the `?` in the header), which
 opens by itself on the first visit (`draftle:help-seen` in `localStorage`). A separate page
 with the starter's mobile drawer comes back only when there are several pages. Game colours that are not branding live as CSS

@@ -145,44 +145,32 @@
 	{:else if !data || !puzzle || !answer}
 		<p class="text-center opacity-60">Loading…</p>
 	{:else}
-		<header
-			class="flex items-end justify-between gap-4 border-b-[3px] border-double border-surface-300-700 pb-3"
-		>
-			<div>
-				<div class="flex items-center gap-3">
-					<h1 class="font-display text-3xl font-semibold tracking-tight">
-						{mode === 'daily' ? `Daily #${day}` : 'Practice'}
-					</h1>
-					<span class="badge preset-outlined-surface-500 font-mono text-xs">
-						patch {puzzle.patch}
-					</span>
-				</div>
-				<p class="text-sm opacity-70">Nine picks in. Name the last red one.</p>
+		<!-- Just the five hint squares: the board says what to do, and the patch lives on it. -->
+		<div class="flex items-center justify-center gap-3">
+			{#if mode === 'practice'}
+				<span class="badge preset-outlined-surface-500 font-mono text-xs">practice</span>
+			{/if}
+			<div class="flex gap-1.5" title="{unlocked} of {HINTS} hints unlocked">
+				{#each { length: HINTS }, i (i)}
+					<span
+						class="h-4 w-4 rounded-[3px] {i < misses
+							? 'bg-(--side-red)'
+							: won && i === misses
+								? 'bg-success-500'
+								: 'bg-surface-300-700'}"
+					></span>
+				{/each}
 			</div>
-			<div class="flex items-center gap-2 pb-1">
-				{#if guesses.length > 0}
-					<span class="font-mono text-xs opacity-60">
-						{guesses.length}
-						{guesses.length === 1 ? 'try' : 'tries'}
-					</span>
-				{/if}
-				<div class="flex gap-1.5" title="{unlocked} of {HINTS} hints unlocked">
-					{#each { length: HINTS }, i (i)}
-						<span
-							class="h-4 w-4 rounded-[3px] {i < misses
-								? 'bg-(--side-red)'
-								: won && i === misses
-									? 'bg-success-500'
-									: 'bg-surface-300-700'}"
-						></span>
-					{/each}
-				</div>
-			</div>
-		</header>
+		</div>
 
 		<div
-			class="rounded-container border border-surface-300-700 bg-surface-100-900/40 p-4 shadow-sm"
+			class="relative rounded-container border border-surface-300-700 bg-surface-100-900/40 p-4 shadow-sm"
 		>
+			<!-- the patch sits on the frame, like a label on a scorecard -->
+			<span
+				class="absolute -top-2.5 left-1/2 -translate-x-1/2 rounded-base border border-surface-400-600 bg-surface-50-950 px-2 font-mono text-[11px] leading-[1.15rem]"
+				>patch {puzzle.patch}</span
+			>
 			<DraftBoard {puzzle} version={data.version} {byName} reveal={over} />
 		</div>
 
