@@ -65,13 +65,18 @@ does not run Go. Rerun `make export` and commit after `make data`.
   (`blueTeam`, `redTeam`, from `ScoreboardGames.Team1/Team2`, Team1 = blue) and the game
   `date` stay hidden on the board until the puzzle ends.
 - Bans are always five positions in the JSON, `""` for a skipped ban, so the phases line up.
-- `src/lib/game/logic.ts`: rules. 6 tries. Each guess shows class match (Data Dragon
-  tags) and whether the answer is more or less picked in that role and patch. One hint
-  unlocks per miss (`unlockedHints`): class → picks against the lane opponent → meta rank →
-  first letter → one of three. The class hint is skipped once a guess matched the class
-  exactly. That is checked miss by miss, so a hint already shown never disappears.
+- `src/lib/game/logic.ts`: rules. **Unlimited tries, five clues** (decided 2026-11-20). The
+  five squares in the header are the clues: each of the first five misses fills one and
+  unlocks the next clue; after that the player keeps guessing, and a "Give up" button
+  appears (`draftle:day:<n>:gaveup`). Each guess shows class match (Data Dragon tags) and
+  whether the answer is more or less picked in that role and patch. Clues, weakest first:
+  class → melee/ranged → picks against the lane opponent → popularity band (top 5 / top 15
+  / outside / pocket pick, not the exact rank) → how often the red team played it in that
+  role this year (`teamPicks`, leave-one-out). Dropped as too strong: first letter and
+  "one of three". Damage type was tried and dropped: Data Dragon's attack/magic ratings
+  call Hwei, Vex or Fizz "mixed". The share text is "N tries · k/5 clues" or "gave up".
 - **Every number the player sees is per patch** (popularity, picks vs lane opponent, meta
-  rank). `stats.Counts` counts per patch for that reason. Per patch, the vs-opponent count
+  rank), except the team clue, which counts the whole year. `stats.Counts` counts per patch for that reason. Per patch, the vs-opponent count
   for an answer has a median of 4 and is 0 in about 20% of puzzles, and a 0 is a hint too.
 - Champion names from Leaguepedia match Data Dragon `name` exactly (checked on
   2026-11-19, 173 champions). Only `None` / `Missing Data` placeholders differ. Icons load

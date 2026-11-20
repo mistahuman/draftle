@@ -5,7 +5,7 @@
 	import GuessInput from '$lib/components/game/GuessInput.svelte';
 	import ChampIcon from '$lib/components/game/ChampIcon.svelte';
 	import {
-		MAX_GUESSES,
+		CLUES,
 		classMatch,
 		dailyIndex,
 		dayNumber,
@@ -26,9 +26,11 @@
 	let copied = $state(false);
 	// The "who won?" bonus after the puzzle: 1 blue, 2 red, null not answered yet.
 	let winnerCall = $state<1 | 2 | null>(null);
+	let gaveUp = $state(false);
 
 	const storageKey = (d: number) => `draftle:day:${d}`;
 	const winnerKey = (d: number) => `draftle:day:${d}:winner`;
+	const gaveUpKey = (d: number) => `draftle:day:${d}:gaveup`;
 
 	onMount(async () => {
 		try {
@@ -41,6 +43,7 @@
 				if (saved) guesses = JSON.parse(saved);
 				const call = localStorage.getItem(winnerKey(day));
 				if (call === '1' || call === '2') winnerCall = Number(call) as 1 | 2;
+				gaveUp = localStorage.getItem(gaveUpKey(day)) === '1';
 			} catch {
 				// storage unavailable: play without saving
 			}
@@ -54,7 +57,8 @@
 	let answer = $derived(puzzle ? byName.get(puzzle.answer) : undefined);
 	let guessed = $derived(guesses.map((g) => byName.get(g)).filter((c): c is Champion => !!c));
 	let won = $derived(!!puzzle && guesses.includes(puzzle.answer));
-	let over = $derived(won || guesses.length >= MAX_GUESSES);
+	let over = $derived(won || gaveUp);
+	let misses = $derived(guesses.filter((g) => g !== puzzle?.answer).length);
 	let hintList = $derived(puzzle && answer ? unlockedHints(puzzle, answer, guessed) : []);
 	let blueName = $derived(puzzle?.blueTeam || 'Blue side');
 	let redName = $derived(puzzle?.redTeam || 'Red side');
@@ -66,6 +70,18 @@
 		if (mode === 'daily') {
 			try {
 				localStorage.setItem(storageKey(day), JSON.stringify(guesses));
+			} catch {
+				// storage unavailable
+			}
+		}
+	}
+
+	function giveUp() {
+		if (over) return;
+		gaveUp = true;
+		if (mode === 'daily') {
+			try {
+				localStorage.setItem(gaveUpKey(day), '1');
 			} catch {
 				// storage unavailable
 			}
@@ -91,6 +107,7 @@
 		index = Math.floor(Math.random() * data.puzzles.length);
 		guesses = [];
 		winnerCall = null;
+		gaveUp = false;
 		copied = false;
 	}
 
@@ -149,17 +166,24 @@
 				</div>
 				<p class="text-sm opacity-70">Nine picks in. Name the last red one.</p>
 			</div>
-			<div class="flex gap-1.5 pb-1" title="{MAX_GUESSES - guesses.length} tries left">
-				{#each { length: MAX_GUESSES }, i (i)}
-					{@const g = guesses[i]}
-					<span
-						class="h-4 w-4 rounded-[3px] {g === undefined
-							? 'bg-surface-300-700'
-							: g === puzzle.answer
-								? 'bg-success-500'
-								: 'bg-(--side-red)'}"
-					></span>
-				{/each}
+			<div class="flex items-center gap-2 pb-1">
+				{#if guesses.length > 0}
+					<span class="font-mono text-xs opacity-60">
+						{guesses.length}
+						{guesses.length === 1 ? 'try' : 'tries'}
+					</span>
+				{/if}
+				<div class="flex gap-1.5" title="{Math.min(misses, CLUES)} of {CLUES} clues unlocked">
+					{#each { length: CLUES }, i (i)}
+						<span
+							class="h-4 w-4 rounded-[3px] {i < misses
+								? 'bg-(--side-red)'
+								: won && i === misses
+									? 'bg-success-500'
+									: 'bg-surface-300-700'}"
+						></span>
+					{/each}
+				</div>
 			</div>
 		</header>
 
@@ -171,6 +195,13 @@
 
 		{#if !over}
 			<GuessInput champions={data.champions} version={data.version} {blocked} onguess={guess} />
+			{#if misses >= CLUES}
+				<div class="flex justify-end">
+					<button class="btn preset-outlined-surface-500 opacity-70 btn-sm" onclick={giveUp}>
+						Give up and show the pick
+					</button>
+				</div>
+			{/if}
 		{/if}
 
 		{#if hintList.length > 0 && !over}

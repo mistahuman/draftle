@@ -1,6 +1,7 @@
 import type { Champion, Puzzle } from './types';
 
-export const MAX_GUESSES = 6;
+// Unlimited tries; each of the first five misses unlocks one clue.
+export const CLUES = 5;
 
 // Day 1 is the launch day. Daily puzzles cycle through the exported set.
 const EPOCH = Date.UTC(2026, 10, 19);
@@ -35,46 +36,32 @@ export function takenInDraft(p: Puzzle): Set<string> {
 	]);
 }
 
-// One hint unlocks per miss, weakest first. Every number is scoped to the puzzle's patch,
-// the same scope as the per-guess popularity. The class hint is skipped when a guess has
-// already matched the answer's class exactly. The check runs miss by miss, so a hint
-// already shown never disappears.
+// One clue per miss, weakest first, five in all. Every number is scoped to the puzzle's
+// patch except the team clue, which looks at the whole year. Nothing names or narrows
+// the answer to a short list: the old "first letter" and "one of three" clues are gone.
 export function unlockedHints(p: Puzzle, answer: Champion, guesses: Champion[]): string[] {
 	const vs = p.stats[p.answer]?.[1] ?? 0;
-	const decoys = Object.entries(p.stats)
-		.filter(([c]) => c !== p.answer)
-		.sort((a, b) => b[1][0] - a[1][0])
-		.slice(0, 2)
-		.map(([c]) => c);
-	const queue: { kind: 'class' | 'other'; text: string }[] = [
-		{ kind: 'class', text: `Class: ${answer.tags.join(' / ')}.` },
-		{
-			kind: 'other',
-			text:
-				vs > 0
-					? `In patch ${p.patch} it was picked as ${p.role} against ${p.opponent} ${vs} other time${vs === 1 ? '' : 's'}.`
-					: `In patch ${p.patch} nobody else picked it as ${p.role} against ${p.opponent}.`
-		},
-		{
-			kind: 'other',
-			text:
-				p.metaRank > 0
-					? `It is the #${p.metaRank} most picked ${p.role} of patch ${p.patch} (out of ${p.poolSize}).`
-					: `Nobody else picked it as ${p.role} in patch ${p.patch}: a pocket pick.`
-		},
-		{ kind: 'other', text: `It starts with "${p.answer[0]}".` },
-		{ kind: 'other', text: `It is one of: ${[...decoys, p.answer].sort().join(', ')}.` }
+	const r = p.metaRank;
+	const role = p.role;
+	const clues = [
+		`Class: ${answer.tags.join(' / ')}.`,
+		`It is a ${answer.range} champion.`,
+		vs > 0
+			? `In patch ${p.patch} it was picked as ${role} against ${p.opponent} ${vs} other time${vs === 1 ? '' : 's'}.`
+			: `In patch ${p.patch} nobody else picked it as ${role} against ${p.opponent}.`,
+		r === 0
+			? `Nobody else picked it as ${role} in patch ${p.patch}: a pocket pick.`
+			: r <= 5
+				? `It is one of the 5 most picked ${role}s of patch ${p.patch}.`
+				: r <= 15
+					? `It is not a top 5 ${role} of patch ${p.patch}, but it is in the top 15.`
+					: `It is outside the top 15 ${role}s of patch ${p.patch}.`,
+		p.teamPicks > 0
+			? `${p.redTeam} played it as ${role} in ${p.teamPicks} other game${p.teamPicks === 1 ? '' : 's'} this year.`
+			: `${p.redTeam} never played it as ${role} in another game this year.`
 	];
-
-	const wrong = guesses.filter((g) => g.name !== answer.name);
-	const shown: string[] = [];
-	let next = 0;
-	wrong.forEach((_, k) => {
-		const classKnown = wrong.slice(0, k + 1).some((g) => classMatch(g, answer) === 'same');
-		while (next < queue.length && queue[next].kind === 'class' && classKnown) next++;
-		if (next < queue.length) shown.push(queue[next++].text);
-	});
-	return shown;
+	const misses = guesses.filter((g) => g.name !== answer.name).length;
+	return clues.slice(0, Math.min(misses, CLUES));
 }
 
 export function shareText(
@@ -90,6 +77,11 @@ export function shareText(
 			return { same: '🟨', partial: '🟧', none: '⬛' }[classMatch(g, answer)];
 		})
 		.join('');
+	const misses = guesses.filter((g) => g.name !== answer.name).length;
+	const clues = Math.min(misses, CLUES);
+	const head = won
+		? `${guesses.length} ${guesses.length === 1 ? 'try' : 'tries'} · ${clues}/${CLUES} clues`
+		: `gave up after ${guesses.length}`;
 	const bonus = calledWinner === undefined ? '' : `\nwinner ${calledWinner ? '✅' : '❌'}`;
-	return `draftle #${day} ${won ? guesses.length : 'X'}/${MAX_GUESSES}\n${squares}${bonus}`;
+	return `draftle #${day} · ${head}\n${squares}${bonus}`;
 }

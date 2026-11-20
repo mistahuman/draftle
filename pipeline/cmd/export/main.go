@@ -29,21 +29,24 @@ type side struct {
 }
 
 type puzzle struct {
-	ID       string            `json:"id"`
-	Patch    string            `json:"patch"`
-	Event    string            `json:"event"`
-	Winner   int               `json:"winner"`
-	BlueTeam string            `json:"blueTeam"`
-	RedTeam  string            `json:"redTeam"`
-	Date     string            `json:"date"` // YYYY-MM-DD, UTC; "" if unknown
-	Blue     side              `json:"blue"`
-	Red      side              `json:"red"` // first four picks only
-	Role     string            `json:"role"`
-	Answer   string            `json:"answer"`
-	Opponent string            `json:"opponent"`
-	MetaRank int               `json:"metaRank"` // answer's rank in the pool, 0 if absent
-	PoolSize int               `json:"poolSize"`
-	Stats    map[string][2]int `json:"stats"` // champ → [freq, vsOpp], pool only
+	ID       string `json:"id"`
+	Patch    string `json:"patch"`
+	Event    string `json:"event"`
+	Winner   int    `json:"winner"`
+	BlueTeam string `json:"blueTeam"`
+	RedTeam  string `json:"redTeam"`
+	Date     string `json:"date"` // YYYY-MM-DD, UTC; "" if unknown
+	Blue     side   `json:"blue"`
+	Red      side   `json:"red"` // first four picks only
+	Role     string `json:"role"`
+	Answer   string `json:"answer"`
+	Opponent string `json:"opponent"`
+	MetaRank int    `json:"metaRank"` // answer's rank in the pool, 0 if absent
+	// TeamPicks: how often the red team played the answer in R5's role in other games
+	// this year, any patch.
+	TeamPicks int               `json:"teamPicks"`
+	PoolSize  int               `json:"poolSize"`
+	Stats     map[string][2]int `json:"stats"` // champ → [freq, vsOpp], pool only
 }
 
 type output struct {
@@ -105,6 +108,27 @@ func main() {
 
 	counts := stats.Build(games)
 
+	// [team][role][champ] over every game of the year, for the team hint.
+	teamPicks := map[string]map[string]map[string]int{}
+	addTeam := func(team, role, champ string) {
+		if team == "" {
+			return
+		}
+		if teamPicks[team] == nil {
+			teamPicks[team] = map[string]map[string]int{}
+		}
+		if teamPicks[team][role] == nil {
+			teamPicks[team][role] = map[string]int{}
+		}
+		teamPicks[team][role][champ]++
+	}
+	for _, g := range games {
+		for i := 0; i < 5; i++ {
+			addTeam(g.Team1, g.Roles1[i], g.Picks1[i])
+			addTeam(g.Team2, g.Roles2[i], g.Picks2[i])
+		}
+	}
+
 	// Puzzles come from major games only; the hint stats above still count every game,
 	// which keeps the per-patch numbers large enough (the spike ranks R5 as well either way).
 	patches := map[string]bool{}
@@ -161,8 +185,10 @@ func main() {
 			Role:     g.Roles2[4],
 			Answer:   g.Picks2[4],
 			Opponent: g.LaneOpponent(2, 4),
-			PoolSize: len(pool),
-			Stats:    map[string][2]int{},
+			// leave-one-out: this game's own R5 is not counted
+			TeamPicks: teamPicks[g.Team2][g.Roles2[4]][g.Picks2[4]] - 1,
+			PoolSize:  len(pool),
+			Stats:     map[string][2]int{},
 		}
 		for i := 0; i < 5; i++ {
 			p.Blue.Picks = append(p.Blue.Picks, pick{g.Picks1[i], g.Roles1[i]})
